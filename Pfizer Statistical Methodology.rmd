@@ -1,0 +1,66 @@
+---
+title: "Your Paper Title Here"
+author: "Blake Xu, Kevin Ji, Sangey Rinchen"
+date: Date
+output: pdf_document
+urlcolor: blue
+header-includes:
+- \usepackage{amsmath,amsfonts,amssymb}
+- \usepackage{setspace} \doublespacing
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+#Use this code chunk to include libraries, and set global options.
+```
+
+# Abstract
+Write your abstract here.
+
+# Keywords
+*Keyword 1*, *Keyword 2*, *Keyword 3*, *Keyword 4*
+
+\newpage
+
+# Introduction / Background
+Provide an introduction with background information.
+
+```{r label="important_R_code", eval=TRUE, echo=FALSE}
+# You can reference your code in the appendix (sample here).
+```
+
+# Statistical Methods
+
+## Model
+Describe the statistical model used.
+
+## Likelihood Inference
+Detail the likelihood approach.
+
+## Bayesian Inference
+Detail the Bayesian approach.
+
+# Results
+Present your findings. 
+
+# Discussion / Conclusion
+Discuss / conclude here.
+
+# Bibliography
+
+Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
+
+Doe, J. (2020). Title of the Paper. *Journal Name*, 12(3), 45-67.
+
+Last, F., & Last, F. (2025). *Book Title*. Publisher.
+
+Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from https://www.example.com.
+
+# Appendix
+
+## Code
+```{r ref.label = "important_R_code", eval=FALSE}
+```
+
+## Proofs
+If applicable, include detailed mathematical derivations or additional theoretical explanations.
