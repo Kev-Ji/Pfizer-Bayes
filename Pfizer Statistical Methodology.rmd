@@ -12,6 +12,8 @@ fontsize: 11pt
 
 ```{r setup, include=FALSE}
 #Use this code chunk to include libraries, and set global options.
+library(tidyverse)
+library(fastR2)
 ```
 
 # Abstract
@@ -32,10 +34,57 @@ Provide an introduction with background information.
 # Statistical Methods
 
 ## Model
-Describe the statistical model used.
+
+We define $V$ as the proportion of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated and still getting infected. 
+
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the probabilities that the subject received the vaccine and a placebo respectively:  
+
+$$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
+
+What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula:  
+
+$$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
+
+We can transform this variable in terms of $\psi$ as well (which is more helpful for our inferences):  
+
+$$\pi = \frac{1 - \psi}{2 - \psi}$$
 
 ## Likelihood Inference
-Detail the likelihood approach.
+### Likelihood function and MLE
+
+In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the proportion of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
+
+$$V \approx Binom(n, \pi_0)$$
+
+In this case, we know $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the proportion of successes to the number of trials. Hence,  
+
+$$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
+Then, with our formula for $\psi$,  
+
+$$\widehat{\psi}_0^{mle} = \frac{1 - 2(\frac{8}{170})}{1 - (\frac{8}{170})} \approx 0.9506$$  
+
+Let us verify this with the transformed likelihood function, $L^{\ast}(\psi)$:  
+
+$$L(\pi) = \binom{n}{v}\pi^v(1-\pi)^{n-v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v}\frac{(1 - \psi)^v}{(2- \psi)^n}$$  
+
+$$\ell^{\ast}(\psi) = \ln(\binom{n}{v}) + v\ln(1 - \psi) - n\ln(2 - \psi)$$  
+$$\ell^{\ast}(\psi) = \ln(\binom{170}{8}) + 8\ln(1 - \psi) - 170\ln(2 - \psi)$$  
+
+$$\frac{d}{d\psi}\ell^{\ast}(\psi) = -\frac{8}{1 - \psi} + \frac{170}{2 - \psi} = 0$$  
+$$8\psi - 16 - 170\psi + 170 = 0$$  
+$$154 = 162\psi$$  
+$$\widehat{\psi}_0^{mle} = \frac{154}{162} \approx 0.9506$$  
+
+### Second Derivative test
+
+We check the value of the second derivative at the MLE we found to verify it as a maximum:  
+
+$$\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = -\frac{8}{(1 - \psi)^2} + \frac{170}{(2 - \psi)^2}$$  
+$$\frac{-8}{(1 - 0.9506)^2}+\frac{170}{(2 - 0.9506)^2} \approx -3123.834... < 0$$  
+Thus, the critical point we found is a maximum and verifies it as the MLE for $\psi$.  
 
 ## Bayesian Inference
 Detail the Bayesian approach.
