@@ -140,13 +140,13 @@ $$W = 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)})$$
 $$W = 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}})$$  
 $$W = 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v})$$  
 $$W = 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null}))$$  
-$$W = 2(8\ln(0.494) + 170\ln(1.7) - 170\ln(1.494) - 8 \ln(0.7)) \approx 38.3415$$  
+$$W = 2(8\ln(0.0494) + 170\ln(1.7) - 170\ln(1.0494) - 8 \ln(0.7)) \approx 121.6012$$  
 
 As $W \sim \chi_1^2$, we find our p-value as $P(W \geq w)$. This estimates to:  
 
 ```{r label="likelihoodPval", echo = F, eval = T}
 
-pchisq(38.3415, df = 1, lower.tail = F)
+pchisq(121.6012, df = 1, lower.tail = F)
 
 ```
 
