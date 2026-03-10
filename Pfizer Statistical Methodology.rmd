@@ -86,6 +86,71 @@ $$\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = -\frac{8}{(1 - \psi)^2} + \frac{170}{(2
 $$\frac{-8}{(1 - 0.9506)^2}+\frac{170}{(2 - 0.9506)^2} \approx -3123.834... < 0$$  
 Thus, the critical point we found is a maximum and verifies it as the MLE for $\psi$.  
 
+### Large Sample Confidence Interval  
+
+We will take the large sample approach to find our confidence interval for the MLE. Before we do so, we plot the second-order Taylor approximation against the log-likelihood to ensure our approximations hold:  
+
+```{r label = "frequentistTaylorPlot", echo = F, eval = T, warning=F}
+loglik_psi <- function(psi, n, v){
+  c <- choose(170, 8)
+  return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
+}
+
+ml_psi <- maxLik2(loglik = loglik_psi,
+                    start = 0.9, n = 170, v = 8)
+
+plot(ml_psi) +
+  labs(title = "Second order approximation to the psi likelihood",
+  x = expression(psi))
+```
+
+We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the Fisher Information:  
+
+$$I(\psi) = - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right]$$  
+$$I(\psi) = E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right]$$  
+$$I(\psi) = \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2}$$  
+$$I(\widehat{\psi}_0^{mle}) = \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335$$  
+
+We then compute the 95\% large sample confidence interval with the formula:  
+$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I(\widehat{\psi}_0^{mle})}}$$  
+
+```{r label = "likelihoodCI", echo = F, results = 'hide'}
+
+z <- qnorm(0.975)
+I <- (8/(1 - 0.9506)^2) - (170/(2-0.9506)^2)
+upper <- 0.9506 + z * (1/sqrt(I))
+lower <- 0.9506 - z * (1/sqrt(I))
+
+```
+
+
+Our large sample confidence interval is thus [`r round(lower, 4)`, `r round(upper, 4)`]  
+
+### Significance test: Likelihood Ratio Statistic
+
+Next, we want to find the likelihood ratio statistic $W$ to test whether or not our efficacy rate passes the FDA's standard. We define our hypotheses as follows:
+
+$$H_0: \psi_0 = 0.3 \ \ \ H_1: \psi_0 \neq 0.3$$  
+
+We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$  
+
+We compute as follows:  
+
+$$W = 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)})$$  
+$$W = 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}})$$  
+$$W = 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v})$$  
+$$W = 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null}))$$  
+$$W = 2(8\ln(0.494) + 170\ln(1.7) - 170\ln(1.494) - 8 \ln(0.7)) \approx 38.3415$$  
+
+As $W \sim \chi_1^2$, we find our p-value as $P(W \geq w)$. This estimates to:  
+
+```{r label="likelihoodPval", echo = F, eval = T}
+
+pchisq(38.3415, df = 1, lower.tail = F)
+
+```
+
+
 ## Bayesian Inference
 Detail the Bayesian approach.
 
