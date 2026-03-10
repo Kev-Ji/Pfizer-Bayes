@@ -104,15 +104,15 @@ plot(ml_psi) +
   x = expression(psi))
 ```
 
-We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the Fisher Information:  
+We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the observed Fisher Information:  
 
-$$I(\psi) = - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right]$$  
-$$I(\psi) = E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right]$$  
-$$I(\psi) = \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2}$$  
-$$I(\widehat{\psi}_0^{mle}) = \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335$$  
+$$I_{obs}(\psi) = - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right]$$  
+$$I_{obs}(\psi) = E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right]$$  
+$$I_{obs}(\psi) = \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2}$$  
+$$I_{obs}(\widehat{\psi}_0^{mle}) = \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335$$  
 
 We then compute the 95\% large sample confidence interval with the formula:  
-$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I(\widehat{\psi}_0^{mle})}}$$  
+$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I_{obs}(\widehat{\psi}_0^{mle})}}$$  
 
 ```{r label = "likelihoodCI", echo = F, results = 'hide'}
 
