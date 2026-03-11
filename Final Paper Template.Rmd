@@ -1,0 +1,135 @@
+---
+title: "Your Paper Title Here"
+author: "Your Name(s)"
+date: Date
+output: pdf_document
+urlcolor: blue
+header-includes:
+- \usepackage{amsmath,amsfonts,amssymb}
+- \usepackage{setspace} \doublespacing
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+#Use this code chunk to include libraries, and set global options.
+library(tidyverse)
+```
+
+# Abstract
+Write your abstract here.
+
+# Keywords
+*Keyword 1*, *Keyword 2*, *Keyword 3*, *Keyword 4*
+
+\newpage
+
+# Introduction / Background
+Provide an introduction with background information.
+
+```{r label="important_R_code", eval=TRUE, echo=FALSE}
+# You can reference your code in the appendix (sample here).
+```
+
+# Statistical Methods
+
+## Model
+Describe the statistical model used.
+
+## Likelihood Inference
+Detail the likelihood approach.
+
+## Bayesian Inference
+Detail the Bayesian approach.
+
+
+Let's say we believe 
+
+$$
+\begin{aligned}
+P(\psi \geq 0.3) &= P(\frac{1-2\pi}{1-\pi} \geq 0.3)=0.1 \rightarrow P(\pi \leq \frac{7}{17}) = 0.1 \\
+P(\psi \geq 0) &= P(\frac{1-2\pi}{1-\pi} \geq 0)=0.1\rightarrow P(\pi \leq \frac{1}{2}) = 0.5
+\end{aligned}
+$$
+```{r, warning=FALSE}
+library(LearnBayes)
+beta.select(quantile1 = list(p = 0.1, x = 7/17),
+            quantile2 = list(p = 0.5, x = 0.5))
+```
+
+That is,
+$$
+P(\pi | x)  \sim Beta(26.2+8 , 26.2+162)
+$$
+
+
+
+
+
+$$
+\begin{aligned}
+P(\Psi \leq \psi | x) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|x) \quad -\infty  < \psi \leq 1 \\
+&= P(\pi \geq \frac{\psi-1}{\psi-2}|x) \\
+&= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|x )\\
+F_{\Psi}(\psi|x) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|x) \\
+f_{\Psi}(\psi|x) &=  (1- F_{\pi}(\frac{\psi-1}{\psi-2}|x))'(\frac{\psi-1}{\psi-2})'\\
+f_{\Psi}(\psi|x) &= f_{\pi}(\frac{\psi-1}{\psi-2}|x)\frac{1}{(\psi -2)^2} \\
+&= \frac{(\frac{\psi-1}{\psi-2})^{33.2}(\frac{-1}{\psi-2})^{187.2}}{B(34.2, 188.2)}\frac{1}{(\psi -2)^2} \\
+&= \frac{(1-\psi)^{33.2}}{B(34.2, 188.2)(2-\psi)^{222.4}} \quad  -\infty< \psi \leq 1
+\end{aligned}
+$$
+The prior for $\Psi$ will be 
+$$
+f_{\Psi}(\psi) = \frac{(1-\psi)^{25.2}}{B(26.2, 26.2)(2-\psi)^{52.4}} \quad  -\infty< \psi \leq 1
+$$
+
+
+
+
+
+
+```{r}
+ggplot()+
+  geom_function(
+    fun = function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)},
+    xlim = c(0, 1),
+    aes(color = 'Poserior'),
+    lwd = 1.2
+  )+
+  geom_function(
+    fun = function(x) {(1-x)^25.2/(beta(26.2, 26.2)*(2-x)^52.4)},
+    xlim = c(0, 1),
+    aes(color = 'Prior'),
+    lwd = 1.2
+  )+
+  labs(x = expression(psi), title= paste('Posterior distribution of psi') )+
+  theme_classic()
+
+```
+
+
+
+
+# Results
+Present your findings. 
+
+# Discussion / Conclusion
+Discuss / conclude here.
+
+# Bibliography
+
+Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
+
+Doe, J. (2020). Title of the Paper. *Journal Name*, 12(3), 45-67.
+
+Last, F., & Last, F. (2025). *Book Title*. Publisher.
+
+Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from https://www.example.com.
+
+# Appendix
+
+## Code
+```{r ref.label = "important_R_code", eval=FALSE}
+```
+
+## Proofs
+If applicable, include detailed mathematical derivations or additional theoretical explanations.
