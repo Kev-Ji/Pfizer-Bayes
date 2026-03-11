@@ -47,7 +47,7 @@ What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy,
 
 $$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
 
-We can transform this variable in terms of $\psi$ as well (which is more helpful for our inferences):  
+We can transform this variable in terms of $\psi$ (which is more helpful for our inferences):  
 
 $$\pi = \frac{1 - \psi}{2 - \psi}$$
 
@@ -171,9 +171,9 @@ pval <- pchisq(121.6012, df = 1, lower.tail = F)
 ```
 
 
-With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval to be [placeholder]  
+With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [placeholder]  
 
-The significance test returns `r pval`, which is [comparable/different] from our empirical p-value, [placeholder].
+The significance test returns `r pval`, which is [comparable/different to/from] our empirical p-value, [placeholder].
 
 # Discussion / Conclusion
 Discuss / conclude here.
@@ -209,3 +209,4 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 
 ## Proofs
 If applicable, include detailed mathematical derivations or additional theoretical explanations.
+
