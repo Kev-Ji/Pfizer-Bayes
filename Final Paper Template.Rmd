@@ -27,10 +27,45 @@ Write your abstract here.
 \newpage
 
 # Introduction / Background
-Provide an introduction with background information.
+# Introduction / Background
+Beginning in 2019, the COVID-19 pandemic has had a profound impact on global public health. It has been estimated that approximately 18.2 million people died worldwide as a result of the pandemic(Wang, Haidong et al. 2020-21). Vaccination therefore became a critical strategy for reducing infection and mortality. There are studies showing that "Authorized mRNA COVID-19 vaccines are effective for preventing SARS-CoV-2 infection in real-world conditions." and  COVID-19 vaccination is recommended for all eligible persons."(Thompson et al., 2021). One of the most widely used vaccines is the BNT162b2 mRNA vaccine developed by Pfizer and BioNTech.
 
-```{r label="important_R_code", eval=TRUE, echo=FALSE}
-# You can reference your code in the appendix (sample here).
+Vaccine efficacy measures the proportional reduction in infection risk among vaccinated individuals relative to those receiving placebo. The U.S. Food and Drug Administration (FDA) recommended that COVID-19 vaccines demonstrate at least 30% efficacy to be considered effective. The efficacy of this vaccine was evaluated in a large randomized, placebo-controlled, double-blind clinical trial (Polack et al., 2020), which randomly assigned participants aged 16 years or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine. The primary efficacy endpoint was the occurrence of laboratory-confirmed COVID-19 infection. A total of 170 infections were targeted. 
+
+In our report, we aim to reanalyze these data using both Frequentist and Bayesian statistical approaches.  In particular, we estimate the vaccine efficacy parameter and test whether the efficacy exceeds the FDA guideline of 30%. These analyses provide an independent statistical assessment of the effectiveness of the BNT162b2 vaccine in preventing COVID-19 infection.
+
+
+
+```{r, echo = FALSE, fig.width= 4, fig.height= 2.5, fig.align='center'}
+df <- data.frame(
+  Group = c('BNT162b2', 'Placebo'),
+  cases = c(8, 162),
+  N = c(17411, 17511),
+  rate = c(9/17411, 162/17511)
+)
+
+knitr::kable(df,
+             digits = 3,
+             caption = 'Vaccine Efficacy against Covid 19 at least 7 days
+after second dose in patients without evidence of infection')
+
+
+ggplot(df, aes(x = Group, y = rate, fill = Group))+
+  geom_col()+
+  scale_fill_manual(
+    values = c(
+      'BNT162b2' = 'steelblue',
+      'Placebo' = 'firebrick'
+    )
+  )+
+  labs(
+    x = "Group",
+    y = "Infection Rate",
+    title = "Observed Infection Rates by Group",
+  ) +
+  theme_classic()+
+  theme(legend.position = "none")
+
 ```
 
 # Statistical Methods
@@ -147,70 +182,168 @@ This concludes our likelihood inference approach, and the methods we will employ
 
 ## Bayesian Inference
 Detail the Bayesian approach.
+In this section we describe the Bayesian approach used to estimate the vaccine efficacy parameter  
+\(\psi\), where \(-\infty < \psi \leq 1\).
 
-Let's say we believe 
+Let \(T\) denote the number of observed COVID-19 infections that occurred in the vaccine group among all confirmed infections. From Table 1, there were 170 total infections and 8 occurred in the vaccine group. Conditional on the parameter \(\pi\), defined as
+
+\[
+\pi = \frac{\pi_v}{\pi_v + \pi_p},
+\]
+
+where \(\pi_v\) and \(\pi_p\) represent the infection probabilities in the vaccine and placebo groups respectively, the random variable \(T\) follows a binomial distribution:
+
+\[
+T \mid \pi \sim \text{Binomial}(170, \pi).
+\]
+
+The parameter of primary interest is the **vaccine efficacy**
+
+\[
+\psi = \frac{1 - 2\pi}{1 - \pi}.
+\]
+
+
+
+To complete the Bayesian model, we must specify a prior distribution for \(\pi\). Because \(\pi\) is a probability parameter with support \(0 \leq \pi \leq 1\), a natural choice is the Beta distribution:
+
+\[
+\pi \sim \text{Beta}(a,b).
+\]
+
+The Beta distribution is commonly used as a prior for binomial models because it is defined on \([0,1]\) and is conjugate to the binomial likelihood.
+
+We determine the hyperparameters \(a\) and \(b\) through **prior elicitation** based on two assumptions about vaccine efficacy:
+
+1. The probability that the vaccine meets the FDA efficacy guideline (\(\psi \ge 0.3\)) is 0.1.
+2. The probability that the vaccine performs better than placebo (\(\psi \ge 0\)) is 0.5.
+
+These statements can be translated into conditions on \(\pi\) using the transformation between \(\psi\) and \(\pi\).
 
 $$
 \begin{aligned}
-P(\psi \geq 0.3) &= P(\frac{1-2\pi}{1-\pi} \geq 0.3)=0.1 \rightarrow P(\pi \leq \frac{7}{17}) = 0.1 \\
-P(\psi \geq 0) &= P(\frac{1-2\pi}{1-\pi} \geq 0)=0.1\rightarrow P(\pi \leq \frac{1}{2}) = 0.5
+P(\psi \ge 0.3) 
+&= P\!\left(\frac{1-2\pi}{1-\pi} \ge 0.3\right) = 0.1 \\
+&\Rightarrow P\!\left(\pi \le \frac{7}{17}\right) = 0.1, \\\\[6pt]
+P(\psi \ge 0) 
+&= P\!\left(\frac{1-2\pi}{1-\pi} \ge 0\right) = 0.5 \\
+&\Rightarrow P\!\left(\pi \le \frac{1}{2}\right) = 0.5.
 \end{aligned}
 $$
-```{r, warning=FALSE}
+These equations can be solved numerically to determine suitable values for \(a\) and \(b\). Once the prior is specified, the posterior distribution for \(\pi\) can be derived using the conjugacy of the Beta prior with the Binomial likelihood.
+
+
+Using the elicited quantiles, the prior parameters are obtained numerically. This gives the prior distribution
+
+$$
+\pi \sim \text{Beta}(26.2, 26.2).
+$$
+
+```{r, warning=FALSE, echo = FALSE, eval = FALSE}
 library(LearnBayes)
 beta.select(quantile1 = list(p = 0.1, x = 7/17),
             quantile2 = list(p = 0.5, x = 0.5))
 ```
 
-That is,
+Because the Beta prior is conjugate to the Binomial likelihood, by theorem 13.2, the posterior distribution of $\pi$ is
+
 $$
-P(\pi | x)  \sim Beta(26.2+8 , 26.2+162)
+\pi \mid v \sim \text{Beta}(26.2+8,\;26.2+162)
+= \text{Beta}(34.2,188.2).
 $$
 
+To obtain the posterior distribution of $\psi$, we use the transformation
 
+$$
+\psi = \frac{1-2\pi}{1-\pi}
+\quad \Longleftrightarrow \quad
+\pi = \frac{\psi-1}{\psi-2}.
+$$
 
+For $-\infty < \psi \le 1$, the cumulative distribution function of $\Psi$ is
+
+$$
+\begin{aligned}
+P(\Psi \leq \psi | v) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|v) \quad -\infty  < \psi \leq 1 \\
+&= P(\pi \geq \frac{\psi-1}{\psi-2}|v) \\
+&= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|v )\\
+F_{\Psi}(\psi|v) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|v) \\
+\end{aligned}
+$$
+
+Differentiating gives the posterior density of $\psi$:
 
 
 $$
 \begin{aligned}
-P(\Psi \leq \psi | x) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|x) \quad -\infty  < \psi \leq 1 \\
-&= P(\pi \geq \frac{\psi-1}{\psi-2}|x) \\
-&= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|x )\\
-F_{\Psi}(\psi|x) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|x) \\
-f_{\Psi}(\psi|x) &=  (1- F_{\pi}(\frac{\psi-1}{\psi-2}|x))'(\frac{\psi-1}{\psi-2})'\\
-f_{\Psi}(\psi|x) &= f_{\pi}(\frac{\psi-1}{\psi-2}|x)\frac{1}{(\psi -2)^2} \\
-&= \frac{(\frac{\psi-1}{\psi-2})^{33.2}(\frac{-1}{\psi-2})^{187.2}}{B(34.2, 188.2)}\frac{1}{(\psi -2)^2} \\
-&= \frac{(1-\psi)^{33.2}}{B(34.2, 188.2)(2-\psi)^{222.4}} \quad  -\infty< \psi \leq 1
+f_{\Psi}(\psi|v) &=  (1- F_{\pi}(\frac{\psi-1}{\psi-2}|v))'(\frac{\psi-1}{\psi-2})'\\
+f_{\Psi}(\psi|v) &= f_{\pi}(\frac{\psi-1}{\psi-2}|v)\frac{1}{(\psi -2)^2} \\
 \end{aligned}
 $$
-The prior for $\Psi$ will be 
+
+Substituting the $\text{Beta}(34.2,188.2)$ density gives
 $$
-f_{\Psi}(\psi) = \frac{(1-\psi)^{25.2}}{B(26.2, 26.2)(2-\psi)^{52.4}} \quad  -\infty< \psi \leq 1
+f_{\Psi \mid V}(\psi \mid v)
+=
+\frac{(1-\psi)^{33.2}}
+{B(34.2,188.2)(2-\psi)^{222.4}},
+\qquad -\infty < \psi \le 1.
 $$
 
+Similarly, the prior density of $\psi$ is
+
+$$
+f_{\Psi}(\psi)
+=
+\frac{(1-\psi)^{25.2}}
+{B(26.2,26.2)(2-\psi)^{52.4}},
+\qquad -\infty < \psi \le 1.
+$$
+
+The prior and posterior densities for $\psi$ are shown below.
 
 
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=6, fig.height=4}
+library(ggplot2)
 
+prior_psi <- function(x) {
+  (1-x)^25.2/(beta(26.2,26.2)*(2-x)^52.4)
+}
 
-```{r}
-ggplot()+
+post_psi <- function(x) {
+  (1-x)^33.2/(beta(34.2,188.2)*(2-x)^222.4)
+}
+
+ggplot() +
   geom_function(
-    fun = function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)},
-    xlim = c(0, 1),
-    aes(color = 'Poserior'),
-    lwd = 1.2
-  )+
+    fun = post_psi,
+    xlim = c(0,1),
+    aes(color = "Posterior"),
+    linewidth = 1.2
+  ) +
   geom_function(
-    fun = function(x) {(1-x)^25.2/(beta(26.2, 26.2)*(2-x)^52.4)},
-    xlim = c(0, 1),
-    aes(color = 'Prior'),
-    lwd = 1.2
+    fun = prior_psi,
+    xlim = c(0,1),
+    aes(color = "Prior"),
+    linewidth = 1.2,
+    linetype = 'dashed'
+  ) +
+  scale_color_manual(
+    values = c(
+      "Posterior" = "firebrick",
+      "Prior" = "steelblue"
+    )
   )+
-  labs(x = expression(psi), title= paste('Posterior distribution of psi') )+
+  labs(
+    x = expression(psi),
+    y = "Density",
+    color = "",
+    title = "Prior and Posterior Distributions of Psi"
+  ) +
   theme_classic()
-
 ```
+
 
 
 
@@ -276,7 +409,7 @@ Lower Bound $= q_v = \frac{2*0.1095326-1}{0.1095326 - 1}, \quad 0.1095326$ is 0.
 Upper Bound $= q_v = \frac{2*0.2039136-1}{0.2039136 - 1}, \quad 0.2039136$ from 99.5 percentile of posterior distribution.
 
 
-```{r lower and upper bounds}
+```{r lower and upper bounds, echo = FALSE, eval = FALSE}
 lower_q = qbeta(0.005, shape1 = 34.2, shape2 = 188.2)
 upper_q = qbeta(0.995, shape1 = 34.2, shape2 = 188.2)
 
@@ -286,7 +419,68 @@ upbound <- (2*upper_q - 1)/(upper_q - 1)
 
 Our credible interval is [`r lowbound`,`r upbound`]. This means there is a 99% probability that the real value of $\psi$ lies within this interval. 
 
-For the frequentist method, 
+Using the posterior density derived in the previous section, numerical integration was used to compute summary statistics for the posterior distribution of the vaccine efficacy parameter $\psi$. In particular, the posterior mean, posterior median, and a 95% Bayesian confidence interval were obtained.
+
+The posterior summaries are reported in Table 1.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+post_psi <- function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
+exp_post_psi<- function(x) {x*(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
+
+find_quantile <- function(p){
+  uniroot(f = function(q) {integrate(post_psi, 0, q)$value - p},
+          interval = c(0,1))$root
+}
+q_005 <- find_quantile(0.005)
+q_median <- find_quantile(0.5)
+q_995<- find_quantile(0.995)
+psi_mean <- integrate(exp_post_psi, 0, 1)$value
+
+
+
+result_table <- data.frame(
+  Mean = psi_mean,
+  Median = q_median,
+  'Lower Bound' = q_005,
+  'Upper Bound' = q_995
+)
+
+
+knitr::kable(
+  result_table,
+  digits = 3,
+  caption = "Posterior summary statistics for Psi."
+)
+
+```
+
+### Calculate a Bayesian P-value
+
+To assess whether the vaccine meets the FDA efficacy guideline, we consider the hypothesis test
+
+$$
+H_0: \psi=0.3 \quad H_1:\psi > 0.3
+$$
+Using the posterior distribution of $\psi$, we compute the posterior probability
+
+$$
+P(\psi \le 0.3 \mid v),
+$$
+
+which serves as the Bayesian p-value for this one-sided test.
+
+```{r, echo=FALSE,eval=FALSE,warning=FALSE, message=FALSE}
+integrate(post_psi, 0, 0.3)
+```
+
+The posterior probability is
+
+$$
+P(\psi \leq 0.3|v) = 2.959 \cdot10^{-17}
+$$
+Since the p-value is much lower than $\alpha = 0.05$, we can reject the null hypothesis. That is, the vaccine efficacy is greater than 30% and therefore does meet the FDA criteria.
+
+
 
 # Discussion / Conclusion
 Discuss / conclude here.
