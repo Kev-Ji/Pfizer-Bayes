@@ -65,25 +65,28 @@ $$\widehat{\psi}_0^{mle} = \frac{1 - 2(\frac{8}{170})}{1 - (\frac{8}{170})} \app
 
 Let us verify this with the transformed likelihood function, $L^{\ast}(\psi)$:  
 
-$$L(\pi) = \binom{n}{v}\pi^v(1-\pi)^{n-v}$$  
-$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v}$$  
-$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v}$$  
-$$L^{\ast}(\psi) = \binom{n}{v}\frac{(1 - \psi)^v}{(2- \psi)^n}$$  
-
-$$\ell^{\ast}(\psi) = \ln(\binom{n}{v}) + v\ln(1 - \psi) - n\ln(2 - \psi)$$  
-$$\ell^{\ast}(\psi) = \ln(\binom{170}{8}) + 8\ln(1 - \psi) - 170\ln(2 - \psi)$$  
-
-$$\frac{d}{d\psi}\ell^{\ast}(\psi) = -\frac{8}{1 - \psi} + \frac{170}{2 - \psi} = 0$$  
-$$8\psi - 16 - 170\psi + 170 = 0$$  
-$$154 = 162\psi$$  
-$$\widehat{\psi}_0^{mle} = \frac{154}{162} \approx 0.9506$$  
+\begin{align*}
+L(\pi) &= \binom{n}{v}\pi^v(1-\pi)^{n-v} \\
+L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v} \\
+L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v} \\
+L^{\ast}(\psi) &= \binom{n}{v}\frac{(1 - \psi)^v}{(2- \psi)^n} \\
+\ell^{\ast}(\psi) &= \ln(\binom{n}{v}) + v\ln(1 - \psi) - n\ln(2 - \psi) \\  
+\ell^{\ast}(\psi) &= \ln(\binom{170}{8}) + 8\ln(1 - \psi) - 170\ln(2 - \psi) \\  
+\frac{d}{d\psi}\ell^{\ast}(\psi) &= -\frac{8}{1 - \psi} + \frac{170}{2 - \psi} = 0 \\  
+8\psi - 16 - &170\psi + 170 = 0 \\
+154 &= 162\psi \\
+\widehat{\psi}_0^{mle} &= \frac{154}{162} \approx 0.9506 \\
+\end{align*}
 
 ### Second Derivative test
 
 We check the value of the second derivative at the MLE we found to verify it as a maximum:  
 
-$$\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = -\frac{8}{(1 - \psi)^2} + \frac{170}{(2 - \psi)^2}$$  
-$$\frac{-8}{(1 - 0.9506)^2}+\frac{170}{(2 - 0.9506)^2} \approx -3123.834... < 0$$  
+\begin{align*}
+\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = &-\frac{8}{(1 - \psi)^2} + \frac{170}{(2 - \psi)^2} \\
+\frac{-8}{(1 - 0.9506)^2}+\frac{170}{(2 - 0.9506)^2} &\approx -3123.834... < 0 \\
+\end{align*}
+
 Thus, the critical point we found is a maximum and verifies it as the MLE for $\psi$.  
 
 ### Large Sample Confidence Interval  
@@ -92,7 +95,7 @@ We will take the large sample approach to find our confidence interval for the M
 
 ```{r label = "frequentistTaylorPlot", echo = F, eval = T, warning=F}
 loglik_psi <- function(psi, n, v){
-  c <- choose(170, 8)
+  c <- choose(n, v)
   return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
 }
 
@@ -104,15 +107,17 @@ plot(ml_psi) +
   x = expression(psi))
 ```
 
-We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the observed Fisher Information:  
+We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the Fisher Information:  
 
-$$I_{obs}(\psi) = - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right]$$  
-$$I_{obs}(\psi) = E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right]$$  
-$$I_{obs}(\psi) = \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2}$$  
-$$I_{obs}(\widehat{\psi}_0^{mle}) = \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335$$  
+\begin{align*}
+I(\psi) &= - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right] \\ 
+I_{obs}(\psi) &= E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right] \\
+I_{obs}(\psi) &= \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \\
+I_{obs}(\widehat{\psi}_0^{mle}) &= \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335 \\
+\end{align*}
 
 We then compute the 95\% large sample confidence interval with the formula:  
-$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I_{obs}(\widehat{\psi}_0^{mle})}}$$  
+$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I(\widehat{\psi}_0^{mle})}}$$  
 
 ```{r label = "likelihoodCI", echo = F, results = 'hide'}
 
@@ -136,11 +141,13 @@ We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L
 
 We compute as follows:  
 
-$$W = 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)})$$  
-$$W = 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}})$$  
-$$W = 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v})$$  
-$$W = 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null}))$$  
-$$W = 2(8\ln(0.0494) + 170\ln(1.7) - 170\ln(1.0494) - 8 \ln(0.7)) \approx 121.6012$$  
+\begin{align*}
+W &= 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}) \\  
+W &= 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}}) \\  
+W &= 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v}) \\  
+W &= 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null})) \\  
+W &= 2(8\ln(0.0494) + 170\ln(1.7) - 170\ln(1.0494) - 8 \ln(0.7)) \approx 121.6012 \\  
+\end{align*}
 
 As $W \sim \chi_1^2$, we find our p-value as $P(W \geq w)$. This estimates to:  
 
@@ -174,6 +181,18 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 
 ## Code
 ```{r ref.label = "important_R_code", eval=FALSE}
+```
+
+### Plot second-order taylor approximation against log-likelihood
+```{r ref.label = "frequentistTaylorPlot", echo = T, eval = F, warning=F}
+```
+
+### Compute large sample confidence interval for the MLE  
+```{r ref.label = "likelihoodCI", echo = T, eval = F}
+```
+
+### Compute pvalue using likelihood ratio statistic  
+```{r ref.label="likelihoodPval", echo = T, eval = F}
 ```
 
 ## Proofs
