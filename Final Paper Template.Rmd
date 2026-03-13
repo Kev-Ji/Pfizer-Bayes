@@ -10,9 +10,12 @@ header-includes:
 fontsize: 11pt
 ---
 
-```{r setup, include=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
 #Use this code chunk to include libraries, and set global options.
+
 library(tidyverse)
+library(fastR2)
+
 ```
 
 # Abstract
@@ -33,14 +36,117 @@ Provide an introduction with background information.
 # Statistical Methods
 
 ## Model
-Describe the statistical model used.
+
+We define $V$ as the proportion of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated and still getting infected. 
+
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the probabilities that the subject received the vaccine and a placebo respectively:  
+
+$$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
+
+What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula:  
+
+$$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
+
+We can transform this variable in terms of $\psi$ (which is more helpful for our inferences):  
+
+$$\pi = \frac{1 - \psi}{2 - \psi}$$
 
 ## Likelihood Inference
-Detail the likelihood approach.
+### Likelihood function and MLE
+
+In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the proportion of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
+
+$$V \approx Binom(n, \pi_0)$$
+
+In this case, we know $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the proportion of successes to the number of trials. Hence,  
+
+$$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
+Then, with our formula for $\psi$,  
+
+$$\widehat{\psi}_0^{mle} = \frac{1 - 2(\frac{8}{170})}{1 - (\frac{8}{170})} \approx 0.9506$$  
+
+Let us verify this with the transformed likelihood function, $L^{\ast}(\psi)$. We begin with the binomial likelihood function, and transform it to be in terms of $\psi$:    
+
+\begin{align*}
+L(\pi) &= \binom{n}{v}\pi^v(1-\pi)^{n-v} \\
+L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v} \\
+L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v} \\
+L^{\ast}(\psi) &= \binom{n}{v}\frac{(1 - \psi)^v}{(2- \psi)^n} \\
+\ell^{\ast}(\psi) &= \ln(\binom{n}{v}) + v\ln(1 - \psi) - n\ln(2 - \psi) \\  
+\frac{d}{d\psi}\ell^{\ast}(\psi) &= -\frac{v}{1 - \psi} + \frac{n}{2 - \psi}
+\end{align*}
+
+The above gives us the log-likelihood function $\ell^\ast(\psi)$ and its derivative. We find a critical point by equating the derivative to zero, but we would still need to verify it to be a maximum (and thus, our MLE).  
+
+### Second Derivative test
+
+This is where the second derivative test comes in. We check the value of the second derivative at the critical point to identify the concavity, and whether or not we found a maximum:
+
+\begin{align*}
+\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = &-\frac{v}{(1 - \psi)^2} + \frac{n}{(2 - \psi)^2} \\
+\end{align*}
+
+If the above second derivative is less than 0 at our critical point (or for all values of $\psi$), then it is concave down and we have verified it to be our MLE.  
+
+In that case, we have our MLE: $\widehat{\psi}_0^{mle}$  
+
+### Large Sample Confidence Interval  
+
+The next step of our likelihood inference is finding the confidence interval, for which we take the large sample approach. Before we do so, we plot the second-order Taylor approximation against the log-likelihood to ensure our approximations hold:  
+
+```{r label = "frequentistTaylorPlot", echo = F, eval = T, warning=F}
+loglik_psi <- function(psi, n, v){
+  c <- choose(n, v)
+  return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
+}
+
+ml_psi <- maxLik2(loglik = loglik_psi,
+                    start = 0.9, n = 170, v = 8)
+
+plot(ml_psi) +
+  labs(title = "Second order approximation to the psi likelihood",
+  x = expression(psi))
+```
+
+We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:  
+
+\begin{align*}
+I(\psi) &= - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right] \\ 
+I(\psi) &= E \left[ \frac{v}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \right] \\
+I(\psi) &= \frac{E[v]}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \\
+\text{Note that:} \ E[v] &\approx n * \pi \\
+I(\psi) &= \frac{n * \pi}{(1-\psi)^2} - \frac{n}{(2-\psi)^2}\\
+I(\psi) &= \frac{n-n\psi}{(2-\psi)(1-\psi)^2} - \frac{n}{(2-\psi)^2} \\
+I(\psi) &= \frac{(n - n \psi)(2 - \psi) - n(1-\psi)^2)}{(1-\psi)^2(2-\psi)^2} \\
+I_{obs}(\widehat{\psi}_0^{mle}) & = \frac{(n - n \widehat{\psi}_0^{mle})(2 - \widehat{\psi}_0^{mle}) - n(1-\widehat{\psi}_0^{mle})^2)}{(1-\widehat{\psi}_0^{mle})^2(2-\widehat{\psi}_0^{mle})^2} \\
+\end{align*}
+
+We then compute the 95\% large sample confidence interval with the formula:  
+$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I(\widehat{\psi}_0^{mle})}}$$  
+
+### Significance test: Likelihood Ratio Statistic
+
+We conclude our likelihood inference with a significance test. We want to find the likelihood ratio statistic $W$ to test whether or not our efficacy rate passes the FDA's standard. We define our hypotheses as follows:
+
+$$H_0: \psi_0 = 0.3 \ \ \ H_1: \psi_0 \neq 0.3$$  
+
+We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$  
+
+We compute as follows:  
+
+\begin{align*}
+W &= 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}) \\  
+W &= 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}}) \\  
+W &= 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v}) \\  
+W &= 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null})) \\  
+\end{align*}
+
+We then take the observed $w$ and compare it against the chi-squared distribution of $W$. That is, our p-value will be $P(W \geq w)$, where $W \sim \chi^2_1$  
+
+This concludes our likelihood inference approach, and the methods we will employ to make our final conclusion. The results of these procedures will be presented under the Results section.  
 
 ## Bayesian Inference
 Detail the Bayesian approach.
-
 
 Let's say we believe 
 
@@ -110,10 +216,31 @@ ggplot()+
 
 
 # Results
-
-To perform inference 
-
 Present your findings. 
+
+## Likelihood Inference Results
+
+Utilizing the log likelihood functions and its derivatives, we identify and critical point and verify it to be the MLE. Unsurprisingly, we find it to be equivalent to the estimate we computed at the beginning using the transformation of the binomial MLE. That is, we find $\widehat{\psi}_0^{mle} \approx 0.9506$.  
+
+```{r label = "likelihoodCI", echo = F, results = 'hide'}
+
+z <- qnorm(0.975)
+I <- (8/(1 - 0.9506)^2) - (170/(2-0.9506)^2)
+upper <- 0.9506 + z * (1/sqrt(I))
+lower <- 0.9506 - z * (1/sqrt(I))
+
+```
+
+```{r label="likelihoodPval", echo = F, eval = T, results='hide'}
+
+pval <- pchisq(121.6012, df = 1, lower.tail = F)
+
+```
+
+
+With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [placeholder]  
+
+The significance test returns `r pval`, which is [comparable/different to/from] our empirical p-value, [placeholder].
 
 Median of posterior distribution: 
 
@@ -124,6 +251,8 @@ $P(1-2\pi \leq (q|u)(1-\pi))$ \newline
 inverse <- qbeta(0.5, 34.2, 188.2, lower.tail = F)
 q <- (2*inverse - 1)/(inverse - 1 )
 ```
+
+## Bayesian Inference Results
 
 To perform inference with Bayesian methods, summary statistics of the posterior distribution must be reported. For this report, the posterior median will be reported.
 
@@ -177,6 +306,19 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 ## Code
 ```{r ref.label = "important_R_code", eval=FALSE}
 ```
+
+### Plot second-order taylor approximation against log-likelihood
+```{r ref.label = "frequentistTaylorPlot", echo = T, eval = F, warning=F}
+```
+
+### Compute large sample confidence interval for the MLE  
+```{r ref.label = "likelihoodCI", echo = T, eval = F}
+```
+
+### Compute pvalue using likelihood ratio statistic  
+```{r ref.label="likelihoodPval", echo = T, eval = F}
+```
+
 
 ## Proofs
 If applicable, include detailed mathematical derivations or additional theoretical explanations.
