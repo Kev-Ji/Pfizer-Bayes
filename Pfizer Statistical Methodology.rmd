@@ -12,6 +12,8 @@ fontsize: 11pt
 
 ```{r setup, include=FALSE}
 #Use this code chunk to include libraries, and set global options.
+library(tidyverse)
+library(fastR2)
 ```
 
 # Abstract
@@ -32,10 +34,122 @@ Provide an introduction with background information.
 # Statistical Methods
 
 ## Model
-Describe the statistical model used.
+
+We define $V$ as the proportion of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated and still getting infected. 
+
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the probabilities that the subject received the vaccine and a placebo respectively:  
+
+$$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
+
+What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula:  
+
+$$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
+
+We can transform this variable in terms of $\psi$ as well (which is more helpful for our inferences):  
+
+$$\pi = \frac{1 - \psi}{2 - \psi}$$
 
 ## Likelihood Inference
-Detail the likelihood approach.
+### Likelihood function and MLE
+
+In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the proportion of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
+
+$$V \approx Binom(n, \pi_0)$$
+
+In this case, we know $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the proportion of successes to the number of trials. Hence,  
+
+$$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
+Then, with our formula for $\psi$,  
+
+$$\widehat{\psi}_0^{mle} = \frac{1 - 2(\frac{8}{170})}{1 - (\frac{8}{170})} \approx 0.9506$$  
+
+Let us verify this with the transformed likelihood function, $L^{\ast}(\psi)$:  
+
+$$L(\pi) = \binom{n}{v}\pi^v(1-\pi)^{n-v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v}$$  
+$$L^{\ast}(\psi) = \binom{n}{v}\frac{(1 - \psi)^v}{(2- \psi)^n}$$  
+
+$$\ell^{\ast}(\psi) = \ln(\binom{n}{v}) + v\ln(1 - \psi) - n\ln(2 - \psi)$$  
+$$\ell^{\ast}(\psi) = \ln(\binom{170}{8}) + 8\ln(1 - \psi) - 170\ln(2 - \psi)$$  
+
+$$\frac{d}{d\psi}\ell^{\ast}(\psi) = -\frac{8}{1 - \psi} + \frac{170}{2 - \psi} = 0$$  
+$$8\psi - 16 - 170\psi + 170 = 0$$  
+$$154 = 162\psi$$  
+$$\widehat{\psi}_0^{mle} = \frac{154}{162} \approx 0.9506$$  
+
+### Second Derivative test
+
+We check the value of the second derivative at the MLE we found to verify it as a maximum:  
+
+$$\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = -\frac{8}{(1 - \psi)^2} + \frac{170}{(2 - \psi)^2}$$  
+$$\frac{-8}{(1 - 0.9506)^2}+\frac{170}{(2 - 0.9506)^2} \approx -3123.834... < 0$$  
+Thus, the critical point we found is a maximum and verifies it as the MLE for $\psi$.  
+
+### Large Sample Confidence Interval  
+
+We will take the large sample approach to find our confidence interval for the MLE. Before we do so, we plot the second-order Taylor approximation against the log-likelihood to ensure our approximations hold:  
+
+```{r label = "frequentistTaylorPlot", echo = F, eval = T, warning=F}
+loglik_psi <- function(psi, n, v){
+  c <- choose(170, 8)
+  return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
+}
+
+ml_psi <- maxLik2(loglik = loglik_psi,
+                    start = 0.9, n = 170, v = 8)
+
+plot(ml_psi) +
+  labs(title = "Second order approximation to the psi likelihood",
+  x = expression(psi))
+```
+
+We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. First, the observed Fisher Information:  
+
+$$I_{obs}(\psi) = - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right]$$  
+$$I_{obs}(\psi) = E \left[ \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2} \right]$$  
+$$I_{obs}(\psi) = \frac{8}{(1-\psi)^2} - \frac{170}{(2-\psi)^2}$$  
+$$I_{obs}(\widehat{\psi}_0^{mle}) = \frac{8}{(1-0.9506)^2} - \frac{170}{(2-0.9506)^2} \approx 3123.8335$$  
+
+We then compute the 95\% large sample confidence interval with the formula:  
+$$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I_{obs}(\widehat{\psi}_0^{mle})}}$$  
+
+```{r label = "likelihoodCI", echo = F, results = 'hide'}
+
+z <- qnorm(0.975)
+I <- (8/(1 - 0.9506)^2) - (170/(2-0.9506)^2)
+upper <- 0.9506 + z * (1/sqrt(I))
+lower <- 0.9506 - z * (1/sqrt(I))
+
+```
+
+
+Our large sample confidence interval is thus [`r round(lower, 4)`, `r round(upper, 4)`]  
+
+### Significance test: Likelihood Ratio Statistic
+
+Next, we want to find the likelihood ratio statistic $W$ to test whether or not our efficacy rate passes the FDA's standard. We define our hypotheses as follows:
+
+$$H_0: \psi_0 = 0.3 \ \ \ H_1: \psi_0 \neq 0.3$$  
+
+We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$  
+
+We compute as follows:  
+
+$$W = 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)})$$  
+$$W = 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}})$$  
+$$W = 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v})$$  
+$$W = 2 (v\ln(1 - \widehat{\psi}_0^{mle}) + n\ln(2 - \psi_0^{null}) - n\ln(2 - \widehat{\psi}_0^{mle}) - v\ln(1 - \psi_0^{null}))$$  
+$$W = 2(8\ln(0.0494) + 170\ln(1.7) - 170\ln(1.0494) - 8 \ln(0.7)) \approx 121.6012$$  
+
+As $W \sim \chi_1^2$, we find our p-value as $P(W \geq w)$. This estimates to:  
+
+```{r label="likelihoodPval", echo = F, eval = T}
+
+pchisq(121.6012, df = 1, lower.tail = F)
+
+```
+
 
 ## Bayesian Inference
 Detail the Bayesian approach.
