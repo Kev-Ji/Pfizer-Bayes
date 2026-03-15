@@ -1,7 +1,7 @@
 ---
-title: "Your Paper Title Here"
-author: "Your Name(s)"
-date: Date
+title: "Frequentist and Bayesian Reanalysis of the Pfizer BNT162b2 Vaccine Trial"
+author: "Blake Xu, Kevin Ji, Sangey Rinchen"
+date: 03/14/2026
 output: pdf_document
 urlcolor: blue
 header-includes:
@@ -12,34 +12,55 @@ fontsize: 11pt
 
 ```{r setup, include=FALSE}
 #Use this code chunk to include libraries, and set global options.
-
+library(ggplot2)
 library(tidyverse)
 library(fastR2)
 
 ```
 
 # Abstract
-Write your abstract here.
+
+COVID-19 caused major global health problems and created an urgent need for effective vaccines. In this study, we reviewed the Pfizer–BioNTech BNT162b2 vaccine trial reported by Polack et al. and reanalyze its efficacy using both frequentist and Bayesian methods. Using the observed data of 8 infections in the vaccine group and 162 in the placebo group, we estimate the vaccine efficacy parameter and evaluate whether it exceeds the FDA benchmark of 30%. The frequentist analysis uses maximum likelihood estimation, a large-sample confidence interval, and a likelihood ratio test. The Bayesian analysis uses a beta-binomial model with prior elicitation, posterior summaries, and a posterior probability calculation. Both approaches show strong evidence that the vaccine efficacy is substantially greater than 30%. Our findings confirm the high effectiveness of the BNT162b2 vaccine and demonstrate how frequentist and Bayesian methods can provide complementary perspectives in statistical analysis.
 
 # Keywords
-*Keyword 1*, *Keyword 2*, *Keyword 3*, *Keyword 4*
+*Bayesian Inference*, *Likelihood Inference*, *COVID-19*, *Vaccine efficacy*
 
 \newpage
 
-# Introduction / Background
-Provide an introduction with background information.
+# Introduction
+Beginning in 2019, the COVID-19 pandemic has had a profound impact on global public health. It has been estimated that approximately 18.2 million people died worldwide as a result of the pandemic(Wang, Haidong et al. 2020-21). Vaccination therefore became a critical strategy for reducing infection and mortality. There are studies showing that "Authorized mRNA COVID-19 vaccines are effective for preventing SARS-CoV-2 infection in real-world conditions." and  COVID-19 vaccination is recommended for all eligible persons."(Thompson et al., 2021). One of the most widely used vaccines is the BNT162b2 mRNA vaccine developed by Pfizer and BioNTech.
 
-```{r label="important_R_code", eval=TRUE, echo=FALSE}
-# You can reference your code in the appendix (sample here).
+Vaccine efficacy measures the proportional reduction in infection risk among vaccinated individuals relative to those receiving placebo. The U.S. Food and Drug Administration (FDA) recommended that COVID-19 vaccines demonstrate at least 30% efficacy to be considered effective. The efficacy of this vaccine was evaluated in a large randomized, placebo-controlled, double-blind clinical trial (Polack et al., 2020), which randomly assigned participants aged 16 years or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine. The primary efficacy endpoint was the occurrence of laboratory-confirmed COVID-19 infection. A total of 170 infections were targeted(Polack et al., 2020). 
+
+In our report, we aim to re-analyze these data using both Frequentist and Bayesian statistical approaches.  In particular, we estimate the vaccine efficacy parameter and test whether the efficacy exceeds the FDA guideline of 30%. These analyses provide an independent statistical assessment of the effectiveness of the BNT162b2 vaccine in preventing COVID-19 infection.
+
+
+
+
+```{r, label ='data vis' ,echo = FALSE, fig.width= 4, fig.height= 2.5, fig.align='center'}
+df <- data.frame(
+  Group = c('BNT162b2', 'Placebo'),
+  cases = c(8, 162),
+  N = c(17411, 17511),
+  rate = c(8/17411, 162/17511)
+)
+knitr::kable(df, digits = 5, caption =  "vaccine efficacy at least 7 days after dose two"
+)
+ggplot(df, aes(x = Group, y = rate, fill = Group))+
+  geom_col()+ scale_fill_manual(
+    values = c('BNT162b2' = 'steelblue', 'Placebo' = 'firebrick')
+  )+labs(x = "Group",y = "Infection Rate",title = "Observed Infection Rates by Group",
+         caption = "Figure 1: Observed Infection Rates by Group") +
+  theme_classic()+ theme(legend.position = "none", plot.caption = element_text(hjust = 0.5))
 ```
 
 # Statistical Methods
 
 ## Model
 
-We define $V$ as the proportion of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated and still getting infected. 
+We define $V$ as the number of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated given that they are infected. 
 
-This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the probabilities that the subject received the vaccine and a placebo respectively:  
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the proportions that the subject received the vaccine and a placebo respectively, and since the trial is approximately 1:1 randomized, we have 
 
 $$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
 
@@ -54,11 +75,11 @@ $$\pi = \frac{1 - \psi}{2 - \psi}$$
 ## Likelihood Inference
 ### Likelihood function and MLE
 
-In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the proportion of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
+In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the number of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
 
 $$V \approx Binom(n, \pi_0)$$
 
-In this case, we know $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the proportion of successes to the number of trials. Hence,  
+In this case, from Table 1, there were $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the number of successes to the number of trials. Hence,  
 
 $$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
 Then, with our formula for $\psi$,  
@@ -94,18 +115,19 @@ In that case, we have our MLE: $\widehat{\psi}_0^{mle}$
 
 The next step of our likelihood inference is finding the confidence interval, for which we take the large sample approach. Before we do so, we plot the second-order Taylor approximation against the log-likelihood to ensure our approximations hold:  
 
-```{r label = "frequentistTaylorPlot", echo = F, eval = T, warning=F}
+```{r label = "frequentistTaylorPlot",fig.height= 2.5, fig.width= 4.5 ,echo = F, eval = T, warning=F}
 loglik_psi <- function(psi, n, v){
   c <- choose(n, v)
   return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
 }
-
 ml_psi <- maxLik2(loglik = loglik_psi,
                     start = 0.9, n = 170, v = 8)
-
 plot(ml_psi) +
   labs(title = "Second order approximation to the psi likelihood",
-  x = expression(psi))
+  x = expression(psi), caption = "Figure 2: Log-likelihood function and second-order approximation for psi ."
+  )+
+  theme_classic()+
+  theme(plot.caption = element_text(hjust = 0.5))
 ```
 
 We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:  
@@ -146,95 +168,170 @@ We then take the observed $w$ and compare it against the chi-squared distributio
 This concludes our likelihood inference approach, and the methods we will employ to make our final conclusion. The results of these procedures will be presented under the Results section.  
 
 ## Bayesian Inference
-Detail the Bayesian approach.
+In this section we describe the Bayesian approach used to estimate the vaccine efficacy parameter $\psi$, where $-\infty < \psi \leq 1$. 
 
-Let's say we believe 
+To complete the Bayesian model, we specify a Beta prior for $\pi$:
+$$
+\pi \sim \text{Beta}(a,b).
+$$
 
+The Beta family is a natural prior for a binomial parameter because it is supported on $[0,1]$ and is conjugate to the binomial likelihood.
+
+We chose the prior through elicitation on the vaccine efficacy parameter $\psi$ rather than directly on $\pi$. Our goal was to use a deliberately skeptical prior that would require the observed data to provide strong evidence before concluding that the vaccine was effective. This choice is reasonable because, at the design stage of a clinical trial, substantial uncertainty remains about whether a candidate vaccine will exceed the FDA efficacy benchmark of 30\%. 
+
+Specifically, we imposed the following prior beliefs:
+
+1. $P(\psi \ge 0.3) = 0.1$,
+
+2. $P(\psi \ge 0) = 0.5$.
+
+The first statement assigns only a 10\% prior probability to the event that vaccine efficacy exceeds the FDA benchmark, which shows skepticism about strong efficacy before seeing the trial data. The second statement centers prior belief at the boundary between harmful and beneficial effects by assigning probability 0.5 to $\psi \ge 0$.
+
+Using the transformation
 $$
-\begin{aligned}
-P(\psi \geq 0.3) &= P(\frac{1-2\pi}{1-\pi} \geq 0.3)=0.1 \rightarrow P(\pi \leq \frac{7}{17}) = 0.1 \\
-P(\psi \geq 0) &= P(\frac{1-2\pi}{1-\pi} \geq 0)=0.1\rightarrow P(\pi \leq \frac{1}{2}) = 0.5
-\end{aligned}
+\psi = \frac{1-2\pi}{1-\pi}
+\quad \Longleftrightarrow \quad 
+\pi = \frac{\psi-1}{\psi-2} \qquad  (1)
 $$
-```{r, warning=FALSE}
+these prior beliefs become
+$$
+P\left(\pi \le \frac{7}{17}\right)=0.1,
+\qquad
+P\left(\pi \le \frac12\right)=0.5.
+$$
+
+Solving these equations numerically gives
+$$
+\pi \sim \text{Beta}(26.2,26.2).
+$$
+
+
+
+```{r, label = 'find prior', warning=FALSE, echo = FALSE, eval = FALSE}
 library(LearnBayes)
 beta.select(quantile1 = list(p = 0.1, x = 7/17),
             quantile2 = list(p = 0.5, x = 0.5))
 ```
 
-That is,
+Because the Beta prior is conjugate to the Binomial likelihood, by theorem 13.2, the posterior distribution of $\pi$ is
+
 $$
-P(\pi | x)  \sim Beta(26.2+8 , 26.2+162)
+\pi \mid v \sim \text{Beta}(26.2+8,\;26.2+162)
+= \text{Beta}(34.2,188.2).
 $$
 
+To obtain the posterior distribution of $\psi$, we use the transformation (1) 
 
 
+For $-\infty < \psi \le 1$, the cumulative distribution function of $\Psi$ is
+
+$$
+\begin{aligned}
+P(\Psi \leq \psi | v) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|v) \quad -\infty  < \psi \leq 1 \\
+&= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|v )\\
+F_{\Psi}(\psi|v) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|v) \\
+\end{aligned}
+$$
+
+Differentiating gives the posterior density of $\psi$:
 
 
 $$
 \begin{aligned}
-P(\Psi \leq \psi | x) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|x) \quad -\infty  < \psi \leq 1 \\
-&= P(\pi \geq \frac{\psi-1}{\psi-2}|x) \\
-&= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|x )\\
-F_{\Psi}(\psi|x) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|x) \\
-f_{\Psi}(\psi|x) &=  (1- F_{\pi}(\frac{\psi-1}{\psi-2}|x))'(\frac{\psi-1}{\psi-2})'\\
-f_{\Psi}(\psi|x) &= f_{\pi}(\frac{\psi-1}{\psi-2}|x)\frac{1}{(\psi -2)^2} \\
-&= \frac{(\frac{\psi-1}{\psi-2})^{33.2}(\frac{-1}{\psi-2})^{187.2}}{B(34.2, 188.2)}\frac{1}{(\psi -2)^2} \\
-&= \frac{(1-\psi)^{33.2}}{B(34.2, 188.2)(2-\psi)^{222.4}} \quad  -\infty< \psi \leq 1
+f_{\Psi}(\psi|v) &=  (1- F_{\pi}(\frac{\psi-1}{\psi-2}|v))'(\frac{\psi-1}{\psi-2})'\\
+f_{\Psi}(\psi|v) &= f_{\pi}(\frac{\psi-1}{\psi-2}|v)\frac{1}{(\psi -2)^2} \\
 \end{aligned}
 $$
-The prior for $\Psi$ will be 
+
+Substituting the $\text{Beta}(34.2,188.2)$ density gives
 $$
-f_{\Psi}(\psi) = \frac{(1-\psi)^{25.2}}{B(26.2, 26.2)(2-\psi)^{52.4}} \quad  -\infty< \psi \leq 1
+f_{\Psi \mid V}(\psi \mid v)
+=
+\frac{(1-\psi)^{33.2}}
+{B(34.2,188.2)(2-\psi)^{222.4}},
+\qquad -\infty < \psi \le 1.
 $$
 
+Similarly, the prior density of $\psi$ is
+
+$$
+f_{\Psi}(\psi)
+=
+\frac{(1-\psi)^{25.2}}
+{B(26.2,26.2)(2-\psi)^{52.4}},
+\qquad -\infty < \psi \le 1.
+$$
+
+The prior and posterior densities for $\psi$ are shown below.
 
 
 
-
-
-```{r}
-ggplot()+
-  geom_function(
-    fun = function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)},
-    xlim = c(0, 1),
-    aes(color = 'Poserior'),
-    lwd = 1.2
-  )+
-  geom_function(
-    fun = function(x) {(1-x)^25.2/(beta(26.2, 26.2)*(2-x)^52.4)},
-    xlim = c(0, 1),
-    aes(color = 'Prior'),
-    lwd = 1.2
-  )+
-  labs(x = expression(psi), title= paste('Posterior distribution of psi') )+
-  theme_classic()
-
+```{r, label = 'Plot of post dist. of psi', echo=FALSE, warning=FALSE, message=FALSE, fig.width=4.5, fig.height=2.5}
+prior_psi <- function(x) {(1-x)^25.2/(beta(26.2,26.2)*(2-x)^52.4)}
+post_psi <- function(x) {(1-x)^33.2/(beta(34.2,188.2)*(2-x)^222.4)}
+ggplot() +
+geom_function(fun = post_psi, xlim = c(0,1), aes(color = "Posterior"), linewidth = 1.2) +
+geom_function(fun = prior_psi, xlim = c(0,1),
+              aes(color = "Prior"), linewidth = 1.2, linetype = 'dashed') +
+scale_color_manual(values = c("Posterior" = "firebrick","Prior" = "steelblue")) +
+labs(x = expression(psi), y = "Density", color = "",
+     title = "Prior and Posterior Distributions of Psi",
+     caption = "Figure 3: Prior and posterior densities for Psi.") +
+theme_classic()+
+  theme(plot.caption = element_text(hjust = 0.5))
 ```
 
+
+Posterior summaries of $\psi$ can also be obtained from the posterior distribution of $\pi$ using the transformation $\psi = \frac{1-2\pi}{1-\pi}$.
+
+The posterior median of $\psi$ is defined by the value $q_{\psi, 0.5}$ satisfying
+
+$$
+P(\psi \le q_{0.5} \mid v_{obs}) = 0.5.
+$$
+Using the transformation between $\psi$ and $\pi$,
+
+$$
+\begin{aligned}
+P(\psi \le q_{\psi,0.5} \mid v_{obs})
+&= P\left(\frac{1-2\pi}{1-\pi} \le q_{\psi,0.5} \,\middle|\, v_{obs}\right) \\
+&= P\left(\pi(q_{\psi,0.5} -2) \le q_{\psi,0.5} -1 \,\middle|\, v_{obs}\right) \\
+&= P\left(\pi \ge \frac{q_{\psi,0.5}-1}{q_{\psi,0.5} -2} \,\middle|\, v_{obs}\right) =0.5\\
+P\left(\pi \le \frac{q_{\psi,0.5}-1}{q_{\psi,0.5} -2} \,\middle|\, v_{obs}\right)&= 1-0.5
+\end{aligned}
+$$
+
+A similar transformation can be used to obtain the 95\% credible interval for $\psi$. Let $q_{\psi,0.025}$ and $q_{\psi,0.975}$ denote the 2.5th and 97.5th percentiles of the posterior distribution of $\psi$. The corresponding endpoints are
+
+$$
+q_{\psi,0.025}=\frac{1-2q_{\pi,1-0.025}}{1-q_{\pi,1-0.025}},
+\qquad
+q_{\psi,0.975}=\frac{1-2q_{\pi,1-0.975}}{1-q_{\pi,1-0.975}}.
+$$
+
+To assess whether the vaccine meets the FDA efficacy guideline, we compute the posterior probability
+$$
+P(\psi \le 0.3 \mid v),
+$$
+which can be evaluated either directly from the posterior density of $\psi$ or by transforming the equivalent event on $\pi$.
 
 
 
 # Results
-Present your findings. 
 
 ## Likelihood Inference Results
 
 Utilizing the log likelihood functions and its derivatives, we identify and critical point and verify it to be the MLE. Unsurprisingly, we find it to be equivalent to the estimate we computed at the beginning using the transformation of the binomial MLE. That is, we find $\widehat{\psi}_0^{mle} \approx 0.9506$.  
 
 ```{r label = "likelihoodCI", echo = F, results = 'hide'}
-
 z <- qnorm(0.975)
 I <- (8/(1 - 0.9506)^2) - (170/(2-0.9506)^2)
 upper <- 0.9506 + z * (1/sqrt(I))
 lower <- 0.9506 - z * (1/sqrt(I))
-
 ```
 
 ```{r label="likelihoodPval", echo = F, eval = T, results='hide'}
-
 pval <- pchisq(121.6012, df = 1, lower.tail = F)
-
 ```
 
 
@@ -247,51 +344,92 @@ Median of posterior distribution:
 $P(\psi \leq q|u)$ \newline 
 $P(1-2\pi \leq (q|u)(1-\pi))$ \newline 
 
-```{r}
-inverse <- qbeta(0.5, 34.2, 188.2, lower.tail = F)
-q <- (2*inverse - 1)/(inverse - 1 )
-```
 
 ## Bayesian Inference Results
 
-To perform inference with Bayesian methods, summary statistics of the posterior distribution must be reported. For this report, the posterior median will be reported.
-
-To find the posterior median, 
-\begin{alignat*}{2}
-&P(\psi \leq q | v_{obs}) = 0.5 &  \\ 
-&P(\frac{1-2\pi}{1-\pi} \leq q | v_{obs}) =  0.5 & \text{Definition of } \psi \\ 
-&P(1-2\pi \leq q_v - q_v \pi) = 0.5 & \\ 
-&P(1-q_v \leq 2\pi - q_v\pi = 0.5) & \\ 
-&P(\frac{1-q_v}{2-q_v} \leq \pi) = 0.5 & \\ 
-&1 - P(\frac{1-q_v}{2-q_v} \geq \pi) = 0.5 & \text{Definition of complement} \\ 
-&\frac{1-q_v}{2-q_v} = \approx 0.1527383 & \text{Inverting probability function} \\
-&(1-q_v) = (2-q_v)(0.1527383) & \\ 
-&q_v = \frac{2*0.1527383-1}{0.1527383 - 1} \\ 
-&q_v = 0.8197271 &
-\end{alignat*}
-
-The posterior median of Pfizer's COVID-19 efficacy, $\psi$, is 0.819271. To fully contextualize this, the upper and lower bounds of the credible interval are:
-Lower Bound $= q_v = \frac{2*0.1095326-1}{0.1095326 - 1}, \quad 0.1095326$ is 0.005 percentile of posterior distribution. 
-
-Upper Bound $= q_v = \frac{2*0.2039136-1}{0.2039136 - 1}, \quad 0.2039136$ from 99.5 percentile of posterior distribution.
-
-
-```{r lower and upper bounds}
-lower_q = qbeta(0.005, shape1 = 34.2, shape2 = 188.2)
-upper_q = qbeta(0.995, shape1 = 34.2, shape2 = 188.2)
-
-lowbound <- (2*lower_q-1)/(lower_q - 1)
-upbound <- (2*upper_q - 1)/(upper_q - 1)
+```{r, label ='csp', echo= FALSE, eval = T}
+inverse <- qbeta(0.5, 34.2, 188.2)
+q_05 <- (2*inverse - 1)/(inverse - 1 )
+inverse_025 <- qbeta(0.025, 34.2, 188.2)
+inverse_975 <- qbeta(0.975, 34.2, 188.2)
+q_025 <- (1- 2*inverse_975)/(1-inverse_975)
+q_975 <- (1- 2*inverse_025)/(1-inverse_025)
 ```
 
-Our credible interval is [`r lowbound`,`r upbound`]. This means there is a 99% probability that the real value of $\psi$ lies within this interval. 
 
-For the frequentist method, 
+Using the posterior distribution of $\pi \mid v \sim \text{Beta}(34.2,188.2)$ and the transformation discussed in the Method, 
+
+$$
+q_{\psi,0.025}=\frac{1-2q_{\pi,0.975}}{1-q_{\pi,0.975}},
+\qquad
+q_{\psi,0.5}=\frac{1-2q_{\pi,0.5}}{1-q_{\pi,0.5}}
+\qquad
+q_{\psi,0.975}=\frac{1-2q_{\pi,0.025}}{1-q_{\pi,0.025}}
+$$
+
+we obtained a posterior median of `r round(q_05, 3)`, and a 95\% credible interval of (`r round(q_025, 3)`, `r round(q_975, 3)`).
+
+
+
+We can also use the posterior density derived in the previous section and numerical integration to compute summary statistics for the posterior distribution of the vaccine efficacy parameter $\psi$. In particular, the posterior mean, posterior median, and a 95% Bayesian credible interval were obtained.
+
+The posterior summaries are reported in Table 2.
+
+```{r, label = 'Compute statistics for psi', echo=FALSE, warning=FALSE, message=FALSE}
+post_psi <- function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
+exp_post_psi<- function(x) {x*(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
+find_quantile <- function(p){
+  uniroot(f = function(q) {
+    integrate(post_psi, 0, q)$value - p}, 
+    interval = c(0,1))$root}
+q_025 <- find_quantile(0.025)
+q_median <- find_quantile(0.5)
+q_975<- find_quantile(0.975)
+psi_mean <- integrate(exp_post_psi, 0, 1)$value
+result_table <- data.frame(Mean = psi_mean, Median = q_median, 
+                           'Lower Bound' = q_025, 'Upper Bound' = q_975)
+knitr::kable(result_table, digits = 3, caption = "Posterior summary statistics for Psi.")
+```
+
+### Calculate a Bayesian P-value
+
+To assess whether the vaccine meets the FDA efficacy guideline, we consider the hypothesis test
+
+$$
+H_0: \psi=0.3 \quad H_1:\psi > 0.3
+$$
+Using the posterior distribution of $\psi$, we compute the posterior probability
+
+$$
+P(\psi \le 0.3 \mid v),
+$$
+
+which serves as the Bayesian p-value for this one-sided test.
+
+```{r, echo=FALSE,eval=FALSE,warning=FALSE, message=FALSE}
+integrate(post_psi, 0, 0.3)
+```
+
+The posterior probability is
+
+$$
+P(\psi \leq 0.3|v) = 2.959 \cdot10^{-17}
+$$
+Since the posterior probability that $\psi \leq 0.3$ is essentially zero, we can reject the null hypothesis. That is, the vaccine efficacy is greater than 30% and therefore does meet the FDA criteria.
+
+
 
 # Discussion / Conclusion
 Discuss / conclude here.
 
 # Bibliography
+Wang, Haidong, et al. (2022). *Estimating excess mortality due to the COVID-19 pandemic: A systematic analysis of COVID-19-related mortality, 2020–21*. The Lancet, 399(10334), 1513–1536.  
+https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(21)02796-3/fulltext
+
+Thompson, M. G., Burgess, J. L., Naleway, A. L., etour empirical p-value, al. (2021). *Interim estimates of vaccine effectiveness of BNT162b2 and mRNA-1273 COVID-19 vaccines in preventing SARS-CoV-2 infection among health care personnel, first responders, and other essential and frontline workers — Eight U.S. locations, December 2020–March 2021*. MMWR Morbidity and Mortality Weekly Report, 70, 495–500.  
+http://dx.doi.org/10.15585/mmwr.mm7013e3
+
+Polack, F. P., Thomas, S. J., Kitchin, N., Absalon, J., Gurtman, A., Lockhart, S., Perez, J. L., et al. (2020). *Safety and efficacy of the BNT162b2 mRNA Covid-19 vaccine*. **New England Journal of Medicine**, 383(27), 2603–2615. https://doi.org/10.1056/NEJMoa2034577
 
 Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
 
@@ -307,9 +445,13 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 ```{r ref.label = "important_R_code", eval=FALSE}
 ```
 
+### Data visualization
+```{r ref.label = "data vis", echo = T, eval = F, warning=F}
+```
 ### Plot second-order taylor approximation against log-likelihood
 ```{r ref.label = "frequentistTaylorPlot", echo = T, eval = F, warning=F}
 ```
+
 
 ### Compute large sample confidence interval for the MLE  
 ```{r ref.label = "likelihoodCI", echo = T, eval = F}
@@ -317,6 +459,22 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 
 ### Compute pvalue using likelihood ratio statistic  
 ```{r ref.label="likelihoodPval", echo = T, eval = F}
+```
+
+### Find Prior
+```{r ref.label="find prior", echo = T, eval = F}
+```
+
+### Compute statistics for psi
+```{r ref.label= "Compute statistics for psi", echo = T, eval = F}
+```
+
+### Plot of posterior distribution of psi
+```{r ref.label= "Plot of post dist. of psi", echo = T, eval = F}
+```
+
+### Computing 50th, 2.5th, 0.975th of Psi
+```{r ref.label= "csp", echo = T, eval = F}
 ```
 
 
