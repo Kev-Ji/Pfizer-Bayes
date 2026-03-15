@@ -323,7 +323,7 @@ lower <- 0.9506 - z * (1/sqrt(I))
 pval <- pchisq(121.6012, df = 1, lower.tail = F)
 ```
 
-```{r parametric bootstrap}
+```{r label="parametricBootstrap", echo = F, eval = T, results ='hide}
 set.seed(342)
 
 W.func <- function(n, v, mle, null) {
@@ -331,12 +331,13 @@ W.func <- function(n, v, mle, null) {
   return(W)
 }
 
-W <- W.func(170, 8, ml_psi$estimate, 0.3)
+psi_mle <- (1 - 2*ml_pi$estimate)/(1-ml_pi$estimate)
+W <- W.func(170, 8, psi_mle, 0.3)
 
 B <- 100000 
 
 big <- replicate(B, W.func(n = 170, v = rbinom(1, 170, prob = 0.7/1.7),
-                mle = ml_psi$estimate, null = 0.3))
+                mle = psi_mle, null = 0.3))
 
 sum(big > W)
 
@@ -353,7 +354,6 @@ lower.sim <- quantile(psi.sim, c(0.025, 0.975))[[1]]
 upper.sim <- quantile(psi.sim, c(0.025, 0.975))[[2]]
 
 ```
-
 
 With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [`r lower.sim`, `r upper.sim`].
 
@@ -464,6 +464,10 @@ Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
 
 ### Compute pvalue using likelihood ratio statistic  
 ```{r ref.label="likelihoodPval", echo = T, eval = F}
+```
+
+### Parametric Bootstrap for psi
+```{r ref.label="parametricBootstrap", echo = T, eval = F}
 ```
 
 ### Find Prior
