@@ -371,12 +371,6 @@ With the observed Fisher Information, we find our large sample confidence interv
 
 The significance test returns `r pval`, which is comparable to our empirical p-value, `r 1/100000`. Since none of the bootstrapped values were greater than our observed likelihood ratio statistic, W, our empirical P-value was calculated as $\frac {1}{\text{bootstrap sample size} + 1}$.  
 
-Median of posterior distribution: 
-
-$P(\psi \leq q|u)$ \newline 
-$P(1-2\pi \leq (q|u)(1-\pi))$ \newline 
-
-
 ## Bayesian Inference Results
 
 ```{r, label ='csp', echo= FALSE, eval = T}
@@ -464,12 +458,6 @@ http://dx.doi.org/10.15585/mmwr.mm7013e3
 Polack, F. P., Thomas, S. J., Kitchin, N., Absalon, J., Gurtman, A., Lockhart, S., Perez, J. L., et al. (2020). *Safety and efficacy of the BNT162b2 mRNA Covid-19 vaccine*. **New England Journal of Medicine**, 383(27), 2603–2615. https://doi.org/10.1056/NEJMoa2034577
 
 Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
-
-Doe, J. (2020). Title of the Paper. *Journal Name*, 12(3), 45-67.
-
-Last, F., & Last, F. (2025). *Book Title*. Publisher.
-
-Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from https://www.example.com.
 
 # Appendix
 
