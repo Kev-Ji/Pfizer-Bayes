@@ -103,9 +103,9 @@ The above gives us the log-likelihood function $\ell^\ast(\psi)$ and its derivat
 
 This is where the second derivative test comes in. We check the value of the second derivative at the critical point to identify the concavity, and whether or not we found a maximum:
 
-\begin{align*}
-\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = &-\frac{v}{(1 - \psi)^2} + \frac{n}{(2 - \psi)^2} \\
-\end{align*}
+$$
+\frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = -\frac{v}{(1 - \psi)^2} + \frac{n}{(2 - \psi)^2} \\
+$$
 
 If the above second derivative is less than 0 at our critical point (or for all values of $\psi$), then it is concave down and we have verified it to be our MLE, $\widehat{\psi}_0^{mle}$  
 
@@ -136,8 +136,6 @@ I(\psi) &= E \left[ \frac{v}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \right] \\
 I(\psi) &= \frac{E[v]}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \\
 \text{Note that:} \ E[v] &\approx n * \pi \\
 I(\psi) &= \frac{n * \pi}{(1-\psi)^2} - \frac{n}{(2-\psi)^2}\\
-I(\psi) &= \frac{n-n\psi}{(2-\psi)(1-\psi)^2} - \frac{n}{(2-\psi)^2} \\
-I(\psi) &= \frac{(n - n \psi)(2 - \psi) - n(1-\psi)^2)}{(1-\psi)^2(2-\psi)^2} \\
 I_{obs}(\widehat{\psi}_0^{mle}) & = \frac{(n - n \widehat{\psi}_0^{mle})(2 - \widehat{\psi}_0^{mle}) - n(1-\widehat{\psi}_0^{mle})^2)}{(1-\widehat{\psi}_0^{mle})^2(2-\widehat{\psi}_0^{mle})^2} \\
 \end{align*}
 
@@ -146,13 +144,9 @@ $$\widehat{\psi}_0^{mle} \pm z_{\alpha/2}\sqrt{\frac{1}{I(\widehat{\psi}_0^{mle}
 
 ### Significance test: Likelihood Ratio Statistic
 
-We conclude our likelihood inference with a significance test. We want to find the likelihood ratio statistic $W$ to test whether or not our efficacy rate passes the FDA's standard. We define our hypotheses as follows:
-
+We conclude our likelihood inference with a significance test. We want to find the likelihood ratio statistic $W$ to test whether or not our efficacy rate passes the FDA's standard. We define our hypotheses as follows:  
 $$H_0: \psi_0 = 0.3 \ \ \ H_1: \psi_0 \neq 0.3$$  
-
 We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$  
-
-We compute as follows:  
 
 \begin{align*}
 W &= 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}) \\  
@@ -168,7 +162,7 @@ This concludes our likelihood inference approach, and the methods we will employ
 ## Bayesian Inference
 In this section we describe the Bayesian approach used to estimate the vaccine efficacy parameter $\psi$, where $-\infty < \psi \leq 1$. 
 
-To complete the Bayesian model, we specify a Beta prior for $\pi$:
+To complete the Bayesian model, we specify a Beta prior for $\pi$:  
 $$
 \pi \sim \text{Beta}(a,b).
 $$
@@ -425,9 +419,6 @@ Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
 # Appendix
 
 ## Code
-```{r ref.label = "important_R_code", eval=FALSE}
-```
-
 ### Data visualization
 ```{r ref.label = "data vis", echo = T, eval = F, warning=F}
 ```
