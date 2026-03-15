@@ -323,7 +323,7 @@ lower <- 0.9506 - z * (1/sqrt(I))
 pval <- pchisq(121.6012, df = 1, lower.tail = F)
 ```
 
-```{r label="parametricBootstrap", echo = F, eval = T, results ='hide}
+```{r label="parametricBootstrap", echo = F, eval = T, results ='hide'}
 set.seed(342)
 
 W.func <- function(n, v, mle, null) {
