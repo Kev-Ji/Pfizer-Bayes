@@ -60,11 +60,11 @@ ggplot(df, aes(x = Group, y = rate, fill = Group))+
 
 We define $V$ as the number of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated given that they are infected. 
 
-This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the proportions that the subject received the vaccine and a placebo respectively, and since the trial is approximately 1:1 randomized, we have 
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the proportions of COVID infections, for the vaccine and placebo groups respectively, and since the trial is approximately 1:1 randomized, we have 
 
 $$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
 
-What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula:  
+What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula [CITE HERE]:  
 
 $$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
 
@@ -79,7 +79,7 @@ In this section, we take the likelihood approach and break down the problem thro
 
 $$V \approx Binom(n, \pi_0)$$
 
-In this case, from Table 1, there were $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the number of successes to the number of trials. Hence,  
+In this case, from Table 1, there were $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the number of successes to the number of trials [CITE HERE]. Hence,  
 
 $$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
 Then, with our formula for $\psi$,  
@@ -107,30 +107,28 @@ This is where the second derivative test comes in. We check the value of the sec
 \frac{d^2}{d\psi^2}\ell^{\ast}(\psi) = &-\frac{v}{(1 - \psi)^2} + \frac{n}{(2 - \psi)^2} \\
 \end{align*}
 
-If the above second derivative is less than 0 at our critical point (or for all values of $\psi$), then it is concave down and we have verified it to be our MLE.  
-
-In that case, we have our MLE: $\widehat{\psi}_0^{mle}$  
+If the above second derivative is less than 0 at our critical point (or for all values of $\psi$), then it is concave down and we have verified it to be our MLE, $\widehat{\psi}_0^{mle}$  
 
 ### Large Sample Confidence Interval  
 
-The next step of our likelihood inference is finding the confidence interval, for which we take the large sample approach. Before we do so, we plot the second-order Taylor approximation against the log-likelihood to ensure our approximations hold:  
+The next step of our likelihood inference is finding the confidence interval, for which we take the large sample approach. Before we do so, we plot the second-order Taylor approximation against the log-likelihood of $\pi$ to ensure our approximations hold:  
 
 ```{r label = "frequentistTaylorPlot",fig.height= 2.5, fig.width= 4.5 ,echo = F, eval = T, warning=F}
-loglik_psi <- function(psi, n, v){
+loglik_pi <- function(pi, n, v){
   c <- choose(n, v)
-  return(log(c) + (v * log(1 - psi)) - (n * log(2 - psi)))
+  return(log(c) + (v * log(pi)) - ((n-v) * log(1 - pi)))
 }
-ml_psi <- maxLik2(loglik = loglik_psi,
-                    start = 0.9, n = 170, v = 8)
-plot(ml_psi) +
-  labs(title = "Second order approximation to the psi likelihood",
-  x = expression(psi), caption = "Figure 2: Log-likelihood function and second-order approximation for psi ."
+ml_pi <- maxLik2(loglik = loglik_pi,
+                    start = 0.5, n = 170, v = 8)
+plot(ml_pi) +
+  labs(title = "Second order approximation to the pi likelihood",
+  x = expression(pi), caption = "Figure 2: Log-likelihood function and second-order approximation for pi."
   )+
   theme_classic()+
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
-We see the second-order Taylor approximation is very accurate, entirely aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:  
+We see the second-order Taylor approximation is accurate, mostly aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:  
 
 \begin{align*}
 I(\psi) &= - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right] \\ 
@@ -193,7 +191,9 @@ $$
 \quad \Longleftrightarrow \quad 
 \pi = \frac{\psi-1}{\psi-2} \qquad  (1)
 $$
+
 these prior beliefs become
+
 $$
 P\left(\pi \le \frac{7}{17}\right)=0.1,
 \qquad
@@ -205,15 +205,13 @@ $$
 \pi \sim \text{Beta}(26.2,26.2).
 $$
 
-
-
 ```{r, label = 'find prior', warning=FALSE, echo = FALSE, eval = FALSE}
 library(LearnBayes)
 beta.select(quantile1 = list(p = 0.1, x = 7/17),
             quantile2 = list(p = 0.5, x = 0.5))
 ```
 
-Because the Beta prior is conjugate to the Binomial likelihood, by theorem 13.2, the posterior distribution of $\pi$ is
+Because the Beta prior is conjugate to the Binomial likelihood, by theorem 13.2 [CITE HERE], the posterior distribution of $\pi$ is
 
 $$
 \pi \mid v \sim \text{Beta}(26.2+8,\;26.2+162)
@@ -264,8 +262,6 @@ $$
 
 The prior and posterior densities for $\psi$ are shown below.
 
-
-
 ```{r, label = 'Plot of post dist. of psi', echo=FALSE, warning=FALSE, message=FALSE, fig.width=4.5, fig.height=2.5}
 prior_psi <- function(x) {(1-x)^25.2/(beta(26.2,26.2)*(2-x)^52.4)}
 post_psi <- function(x) {(1-x)^33.2/(beta(34.2,188.2)*(2-x)^222.4)}
@@ -280,7 +276,6 @@ labs(x = expression(psi), y = "Density", color = "",
 theme_classic()+
   theme(plot.caption = element_text(hjust = 0.5))
 ```
-
 
 Posterior summaries of $\psi$ can also be obtained from the posterior distribution of $\pi$ using the transformation $\psi = \frac{1-2\pi}{1-\pi}$.
 
@@ -338,12 +333,6 @@ pval <- pchisq(121.6012, df = 1, lower.tail = F)
 With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [placeholder]  
 
 The significance test returns `r pval`, which is [comparable/different to/from] our empirical p-value, [placeholder].
-
-Median of posterior distribution: 
-
-$P(\psi \leq q|u)$ \newline 
-$P(1-2\pi \leq (q|u)(1-\pi))$ \newline 
-
 
 ## Bayesian Inference Results
 
@@ -433,12 +422,6 @@ Polack, F. P., Thomas, S. J., Kitchin, N., Absalon, J., Gurtman, A., Lockhart, S
 
 Brown, B. (2024). *Lecture Title*. Lecture slides, Course Name, University Name.
 
-Doe, J. (2020). Title of the Paper. *Journal Name*, 12(3), 45-67.
-
-Last, F., & Last, F. (2025). *Book Title*. Publisher.
-
-Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from https://www.example.com.
-
 # Appendix
 
 ## Code
@@ -451,7 +434,6 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 ### Plot second-order taylor approximation against log-likelihood
 ```{r ref.label = "frequentistTaylorPlot", echo = T, eval = F, warning=F}
 ```
-
 
 ### Compute large sample confidence interval for the MLE  
 ```{r ref.label = "likelihoodCI", echo = T, eval = F}
@@ -480,3 +462,110 @@ Smith, A., & Johnson, C. (2023). *Title of the Online Article*. Retrieved from h
 
 ## Proofs
 If applicable, include detailed mathematical derivations or additional theoretical explanations.
+
+### Proving that the random variable `V`, representing the proportion of people who were infected with COVID that were in the vaccine group, approximates to the binomial distribution.  
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc} 
+Group & Cases & Sample size \\ \hline
+BNT162b2 & 8 & 17,411 \\
+Placebo & 162 & 17,511 \\
+Total &  170 &  34,922 \\ \hline
+\end{tabular}
+\end{table}
+
+From the above data, we define $X$ as a random variable representing the number of subjects in the vaccine group (of size $n_1$) who were infected with COVID, and $Y$ as a random variable representing the number of subjects in the placebo group (of size $n_2$) who were infected with COVID. We assume they take the binomial distribution as follows:  
+
+$$X \sim Binom(n_1, \pi_v) \ Y \sim Binom(n_2, \pi_p)$$  
+
+Where $\pi_v = P(\text{COVID}|\text{Vaccine})$, $\pi_p = P(\text{COVID}|\text{Placebo})$, and $X$ and $Y$ are independent.    
+We then define $V$ as a random variable that represents the number of subjects that were infected COVID that were in the vaccine group. Then, $V$ is the value of $X$ given the constraint that $X + Y = n$, where $n$ is the sample size of our variable $V$. (which, in our data, is $n = 170$). We define $\pi$ as the rate at which a subject in the sample size $n$ is in the vaccine group.   
+As the sample sizes $n_1$ and $n_2$ are quite large, we know that the binomial random variables $X$ and $Y$ can be approximated with the Poisson. That is,  
+
+$$X \approx Pois(n_1\pi_v) \ Y \approx Pois(n_2\pi_p)$$  
+Where $\lambda_x = E[X] = n_1\pi_v$, and similarly for $\lambda_y = E[Y]$  
+
+Before we proceed with the proof, we will prove two Lemmas, which will help with our main argument.
+
+#### Lemma I
+
+Theorem: The rate of a COVID patient being in the vaccine group, $\pi$, is the probability $P(\text{Vaccine}|\text{COVID})$. Then:  
+
+$$\pi = \frac{P(\text{COVID}|\text{Vaccine)} \cdot P(\text{Vaccine})}{P(\text{COVID})} = \frac{n_1 \pi_v}{\pi_vn_1 + \pi_pn_2}$$ 
+Proof:  
+Using the data and the distribution definitions above:  
+
+\begin{align*}
+P(\text{COVID}|\text{Vaccine}) &= \pi_v  \\
+P(\text{Vaccine}) &= \frac{n_1}{n_1 + n_2}\\  
+P(\text{COVID}) &= \frac{\pi_vn_1 + \pi_pn_2}{n_1 + n_2}\\
+\end{align*}
+
+Thus,  
+
+\begin{align*}  
+\pi &= \frac{\pi_v \cdot \frac{n_1}{n_1 + n_2}}{\frac{\pi_vn_1 + \pi_pn_2}{n_1 + n_2}}\\
+\pi &= \frac{n_1 \pi_v}{\pi_vn_1 + \pi_pn_2}_\square\\
+\end{align*}
+
+#### Lemma II
+
+Theorem: Let $X$ and $Y$ be two independent Poisson random variables. Then, the sum of $X$ and $Y$ is also a Poisson distribution. That is,  
+$$S \sim Pois(\lambda_1 + \lambda_2) \\ S = X + Y$$  
+
+Proof:  
+Let $X \sim Pois(\lambda_1)$ and, independently, $Y \sim Pois(\lambda_2)$. Suppose $S = X + Y$  
+
+Then:  
+
+\begin{align*}
+P(X = x) &= \frac{e^{-\lambda_1}\lambda_1^x}{x!}\\  
+P(Y = n - x) &= \frac{e^{-\lambda_2}\lambda_2^{n-x}}{(n-x)!}\\ 
+\end{align*}  
+
+By theorem 3.1 [CITE HERE]:  
+
+\begin{align*}  
+P(S = n) &= \sum_{x = 0}^{n}P(X = x)P(Y = n - x)\\
+P(S = n) &= \sum_{x = 0}^n \frac{e^{-\lambda_1}\lambda_1^x}{x!} \cdot \frac{e^{-\lambda_2}\lambda_2^{n-x}}{(n-x)!}\\  
+P(S = n) &= e^{-\lambda_1 + \lambda_2} \sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}\\
+\end{align*}
+
+$\sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}$ is the binomial expansion of $\frac{(\lambda_1 + \lambda_2)^n}{n!}$. So,    
+
+$$P(S = n) = \frac{e^{-\lambda_1 + \lambda_2} (\lambda_1 + \lambda_2)^n}{n!}$$  
+
+Thus, from the PMF above,  
+$$X + Y = S \sim Pois(\lambda_1 + \lambda_2)_\square$$  
+
+#### Main proof
+
+Theorem: The random variable $V$, defined above, approximates to the binomial distribution.  
+Proof:  
+We proceed by finding the Probability Mass Function (PMF) of $V$. We know $V$ to be the value of $X$ given the constraint that $X + Y = n$. Our process, minding the independence of $X$ and $Y$, thus follows:  
+
+
+\begin{align*}
+P(V=v) &= P(X = v|X+Y=n)\\  
+P(V=v) &= \frac{P(X = v \cap X+Y = n)}{P(X + Y = n)}\\  
+P(V=v) &= \frac{P(X=v) \times P(Y = n-v)}{P(X + Y = n)}\\  
+\end{align*}
+
+As $X$ and $Y$ can be approximated with the Poisson distribution, we will use the Poisson PMF, $\frac{e^{-\lambda}\lambda^x}{x!}$.  
+Remember that $X \approx Pois(n_1\pi_v)$ and $Y \approx Pois(n_2\pi_p)$. And so, by Lemma II, $X+Y \approx Pois(n_1\pi_v + n_2\pi_p)$  
+
+\begin{align*}
+P(V=v) = \frac{\frac{e^{-(n_1\pi_v)}(n_1\pi_v)^v}{v!} \times \frac{e^{-(n_2\pi_p)}(n_2\pi_p)^{n-v}}{(n-v)!}}{\frac{e^{-(n_1\pi_v + n_2\pi_p)}(n_1\pi_v + n_2\pi_p)^{n}}{n!}}\\  
+P(V = v) = \frac{n!}{v!(n-v)!} \times \frac{(n_1\pi_v)^v(n_2\pi_p)^{n-v} e^{-(n_1\pi_v + n_2\pi_p)}}{(n_1\pi_v + n_2\pi_p)^n e^{-(n_1\pi_v + n_2\pi_p)}}\\  
+P(V=v) = \binom{n}{v} \frac{(n_1\pi_v)^n(n_2\pi_p)^{n-v}}{(n_1\pi_v + n_2\pi_p)^v(n_1\pi_v + n_2\pi_p)^{n-v}}\\
+\text{We apply Lemma I, to simplify the following:} \\  
+\frac{(n_1\pi_v)^v}{(n_1\pi_v + n_2\pi_p)^v} = (\frac{n_1\pi_v}{\pi_vn_1 + \pi_pn_2})^v = \pi^v\\  
+(\frac{n_2\pi_p}{n_1\pi_v + n_2\pi_p})^{n-v} = (1 - \frac{n_1\pi_v}{\pi_vn_1 + \pi_pn_2})^{n-v} = (1 - \pi)^{n - v}\\
+\text{Thus,}\\
+P(V=v) = \binom{n}{v}\pi^v(1-\pi)^{n-v}\\
+\end{align*}
+
+The PMF of the binomial distribution. Therefore:  
+
+$$V \approx Binom(n, \pi)_\blacksquare$$
