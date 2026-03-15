@@ -60,7 +60,7 @@ ggplot(df, aes(x = Group, y = rate, fill = Group))+
 
 We define $V$ as the number of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated given that they are infected. 
 
-This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the probabilities that the subject received the vaccine and a placebo respectively:  
+This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the proportions that the subject received the vaccine and a placebo respectively, and since the trial is approximately 1:1 randomized, we have 
 
 $$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
 
@@ -75,11 +75,11 @@ $$\pi = \frac{1 - \psi}{2 - \psi}$$
 ## Likelihood Inference
 ### Likelihood function and MLE
 
-In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the proportion of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
+In this section, we take the likelihood approach and break down the problem through a frequentist's lens. We begin by approximating $V$, the number of subjects infected with COVID-19 that were vaccinated, to the binomial distribution (proof in appendix):  
 
 $$V \approx Binom(n, \pi_0)$$
 
-In this case, we know $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the proportion of successes to the number of trials. Hence,  
+In this case, from Table 1, there were $n = 170$ and observe $v = 8$. In our lectures, we proved that the MLE of a binomial distribution is the number of successes to the number of trials. Hence,  
 
 $$\widehat{\pi}_0^{mle} = \frac{8}{170}$$  
 Then, with our formula for $\psi$,  
@@ -168,27 +168,7 @@ We then take the observed $w$ and compare it against the chi-squared distributio
 This concludes our likelihood inference approach, and the methods we will employ to make our final conclusion. The results of these procedures will be presented under the Results section.  
 
 ## Bayesian Inference
-In this section we describe the Bayesian approach used to estimate the vaccine efficacy parameter $\psi$, where $-\infty < \psi \leq 1$.
-
-Let $T$ denote the number of observed COVID-19 infections that occurred in the vaccine group among all confirmed infections. From Table 1, there were 170 total infections and 8 occurred in the vaccine group and. Since the trial is approximately 1:1 randomized, conditional on the parameter $\pi$, defined as
-
-$$
-\pi = \frac{\pi_v}{\pi_v + \pi_p},
-$$
-
-where $\pi_v$ and $\pi_p$ represent the infection probabilities in the vaccine and placebo groups respectively, the random variable $T$ follows a binomial distribution:
-
-$$
-T \mid \pi \sim \text{Binomial}(170, \pi).
-$$
-
-The parameter of primary interest is the **vaccine efficacy**
-
-$$
-\psi = \frac{1 - 2\pi}{1 - \pi}.
-$$
-
-
+In this section we describe the Bayesian approach used to estimate the vaccine efficacy parameter $\psi$, where $-\infty < \psi \leq 1$. 
 
 To complete the Bayesian model, we specify a Beta prior for $\pi$:
 $$
@@ -200,16 +180,18 @@ The Beta family is a natural prior for a binomial parameter because it is suppor
 We chose the prior through elicitation on the vaccine efficacy parameter $\psi$ rather than directly on $\pi$. Our goal was to use a deliberately skeptical prior that would require the observed data to provide strong evidence before concluding that the vaccine was effective. This choice is reasonable because, at the design stage of a clinical trial, substantial uncertainty remains about whether a candidate vaccine will exceed the FDA efficacy benchmark of 30\%. 
 
 Specifically, we imposed the following prior beliefs:
+
 1. $P(\psi \ge 0.3) = 0.1$,
+
 2. $P(\psi \ge 0) = 0.5$.
 
 The first statement assigns only a 10\% prior probability to the event that vaccine efficacy exceeds the FDA benchmark, which shows skepticism about strong efficacy before seeing the trial data. The second statement centers prior belief at the boundary between harmful and beneficial effects by assigning probability 0.5 to $\psi \ge 0$.
 
 Using the transformation
 $$
-\psi = \frac{1-2\pi}{1-\pi},
-\qquad
-\pi = \frac{1-\psi}{2-\psi},
+\psi = \frac{1-2\pi}{1-\pi}
+\quad \Longleftrightarrow \quad 
+\pi = \frac{\psi-1}{\psi-2} \qquad  (1)
 $$
 these prior beliefs become
 $$
@@ -238,20 +220,14 @@ $$
 = \text{Beta}(34.2,188.2).
 $$
 
-To obtain the posterior distribution of $\psi$, we use the transformation
+To obtain the posterior distribution of $\psi$, we use the transformation (1) 
 
-$$
-\psi = \frac{1-2\pi}{1-\pi}
-\quad \Longleftrightarrow \quad
-\pi = \frac{\psi-1}{\psi-2}.
-$$
 
 For $-\infty < \psi \le 1$, the cumulative distribution function of $\Psi$ is
 
 $$
 \begin{aligned}
 P(\Psi \leq \psi | v) &=P(\frac{1-2\pi}{1-\pi} \leq \psi|v) \quad -\infty  < \psi \leq 1 \\
-&= P(\pi \geq \frac{\psi-1}{\psi-2}|v) \\
 &= 1- P(\pi  \leq \frac{\psi-1}{\psi-2}|v )\\
 F_{\Psi}(\psi|v) &= 1- F_{\pi}(\frac{\psi-1}{\psi-2}|v) \\
 \end{aligned}
@@ -319,9 +295,8 @@ $$
 \begin{aligned}
 P(\psi \le q_{\psi,0.5} \mid v_{obs})
 &= P\left(\frac{1-2\pi}{1-\pi} \le q_{\psi,0.5} \,\middle|\, v_{obs}\right) \\
-&= P\left(1-2\pi \le q_{\psi,0.5}(1-\pi) \,\middle|\, v_{obs}\right) \\
 &= P\left(\pi(q_{\psi,0.5} -2) \le q_{\psi,0.5} -1 \,\middle|\, v_{obs}\right) \\
-&= P\left(\pi \ge \frac{q_{\psi,0.5}-1}{q_{\psi,0.5} -2} \,\middle|\, v_{obs}\right) \\
+&= P\left(\pi \ge \frac{q_{\psi,0.5}-1}{q_{\psi,0.5} -2} \,\middle|\, v_{obs}\right) =0.5\\
 P\left(\pi \le \frac{q_{\psi,0.5}-1}{q_{\psi,0.5} -2} \,\middle|\, v_{obs}\right)&= 1-0.5
 \end{aligned}
 $$
