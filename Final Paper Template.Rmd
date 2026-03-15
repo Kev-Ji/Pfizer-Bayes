@@ -334,10 +334,42 @@ lower <- 0.9506 - z * (1/sqrt(I))
 pval <- pchisq(121.6012, df = 1, lower.tail = F)
 ```
 
+```{r parametric bootstrap}
+set.seed(342)
 
-With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [placeholder]  
+W.func <- function(n, v, mle, null) {
+  W <- 2*(v*log(1-mle) + n*log(2-null) - n*log(2-mle) - v*log(1-null))
+  return(W)
+}
 
-The significance test returns `r pval`, which is [comparable/different to/from] our empirical p-value, [placeholder].
+W <- W.func(170, 8, ml_psi$estimate, 0.3)
+
+B <- 100000 
+
+big <- replicate(B, W.func(n = 170, v = rbinom(1, 170, prob = 0.7/1.7),
+                mle = ml_psi$estimate, null = 0.3))
+
+sum(big > W)
+
+## Simulate values of psi
+
+psi.func <- function(n, obs) { 
+ view <- rbinom(1, n, prob = obs)/n
+  psi <- (1- 2*view)/(1-view)
+  return(psi)
+}
+
+psi.sim <- replicate(B, psi.func(n = 170, obs = 8/170))
+lower.sim <- quantile(psi.sim, c(0.025, 0.975))[[1]]
+upper.sim <- quantile(psi.sim, c(0.025, 0.975))[[2]]
+
+```
+
+
+With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [`r lower.sim`, `r upper.sim`].
+
+
+The significance test returns `r pval`, which is comparable to our empirical p-value, `r 1/100000`. Since none of the bootstrapped values were greater than our observed likelihood ratio statistic, W, our empirical P-value was calculated as $\frac {1}{\text{bootstrap sample size} + 1}$.  
 
 Median of posterior distribution: 
 
