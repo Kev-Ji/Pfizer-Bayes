@@ -116,7 +116,7 @@ The next step of our likelihood inference is finding the confidence interval, fo
 ```{r label = "frequentistTaylorPlot",fig.height= 2.5, fig.width= 4.5 ,echo = F, eval = T, warning=F}
 loglik_pi <- function(pi, n, v){
   c <- choose(n, v)
-  return(log(c) + (v * log(pi)) - ((n-v) * log(1 - pi)))
+  return(log(c) + (v * log(pi)) + ((n-v) * log(1 - pi)))
 }
 ml_pi <- maxLik2(loglik = loglik_pi,
                     start = 0.5, n = 170, v = 8)
