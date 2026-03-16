@@ -111,7 +111,7 @@ If the above second derivative is less than 0 at our critical point (or for all 
 
 The next step of our likelihood inference is finding the confidence interval, for which we take the large sample approach. Before we do so, we plot the second-order Taylor approximation against the log-likelihood of $\pi$ to ensure our approximations hold:  
 
-```{r label = "frequentistTaylorPlot",fig.height= 2.5, fig.width= 4.5 ,echo = F, eval = T, warning=F}
+```{r label = "frequentistTaylorPlot",fig.height= 3.5, fig.width= 5 ,echo = F, eval = T, warning=F}
 loglik_pi <- function(pi, n, v){
   c <- choose(n, v)
   return(log(c) + (v * log(pi)) + ((n-v) * log(1 - pi)))
@@ -242,7 +242,7 @@ f_{\Psi}(\psi)
 $$  
 The prior and posterior densities (as well as the Pfizer study's prior distribution for comparison) for $\psi$ are shown below.
 
-```{r, label = 'Plot of post dist. of psi', echo=FALSE, warning=FALSE, message=FALSE, fig.width=4.5, fig.height=2.5}
+```{r, label = 'Plot of post dist. of psi', echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=3.5}
 prior_psi <- function(x) {(1-x)^25.2/(beta(26.2,26.2)*(2-x)^52.4)}
 post_psi <- function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
 pfizer_prior <- function(x) {(1-x)^(-0.299898) / (beta(0.700102, 1) * (2-x)^1.700102)}
