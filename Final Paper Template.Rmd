@@ -41,9 +41,9 @@ COVID-19 caused major global health problems and created an urgent need for effe
  \doublespacing
 
 # Introduction
-Beginning in 2019, the COVID-19 pandemic has had a profound impact on global public health. It has been estimated that approximately 18.2 million people died worldwide as a result of the pandemic (Wang, Haidong et al. 2020-21). Vaccination therefore became a critical strategy for reducing infection and mortality. There are studies showing that "Authorized mRNA COVID-19 vaccines are effective for preventing SARS-CoV-2 infection in real-world conditions." and  COVID-19 vaccination is recommended for all eligible persons."(Thompson et al., 2021). One of the most widely used vaccines is the BNT162b2 mRNA vaccine developed by Pfizer and BioNTech.
+Beginning in 2019, the COVID-19 pandemic has had a profound impact on global public health. It has been estimated that approximately 18.2 million people died worldwide as a result of the pandemic (Wang, Haidong et al. 2020-21). Vaccination therefore became a critical strategy for reducing infection and mortality. There are studies showing that "Authorized mRNA COVID-19 vaccines are effective for preventing SARS-CoV-2 infection in real-world conditions." and  COVID-19 vaccination is recommended for all eligible persons." (Thompson et al., 2021). One of the most widely used vaccines is the BNT162b2 mRNA vaccine developed by Pfizer and BioNTech.
 
-Vaccine efficacy measures the proportional reduction in infection risk among vaccinated individuals relative to those receiving placebo. The U.S. Food and Drug Administration (FDA) recommended that COVID-19 vaccines demonstrate at least 30% efficacy to be considered effective. The efficacy of this vaccine was evaluated in a large randomized, placebo-controlled, double-blind clinical trial (Polack et al., 2020), which randomly assigned participants aged 16 years or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine. The primary efficacy endpoint was the occurrence of laboratory-confirmed COVID-19 infection. A total of 170 infections were targeted(Polack et al., 2020). 
+Vaccine efficacy measures the proportional reduction in infection risk among vaccinated individuals relative to those receiving a placebo. The U.S. Food and Drug Administration (FDA) recommended that COVID-19 vaccines demonstrate at least 30% efficacy to be considered effective. The efficacy of this vaccine was evaluated in a large randomized, placebo-controlled, double-blind clinical trial (Polack et al., 2020), which randomly assigned participants aged 16 years or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine. The primary efficacy endpoint was the occurrence of laboratory-confirmed COVID-19 infection. A total of 170 infections were targeted (Polack et al., 2020). 
 
 Transparent, corroborated methodology is vital to global perceptions of public health institutions. The mixed messaging during the pandemic led to a deterioration in trust of public health (Ortiz-Prado et al., 2025). In our report, we aim to corroborate and validate Pfizer's analysis using both Frequentist and Bayesian statistical approaches. The Pfizer vaccine trial was notable in its use of Bayesian methods, whereas other firms used frequentist experimental design. Pfizer's study has been criticized for lacking explanation of study assumptions (most notably the choice of a prior) and pandemic vaccine trials have been criticized for a lack of data transparency (Senn S., 2022). To provide an independent statistical assessment of Pfizer's BNT162b2 vaccine efficacy, we estimate the vaccine efficacy parameter and test whether the efficacy exceeds the FDA guideline of 30%.
 
@@ -120,7 +120,8 @@ ml_pi <- maxLik2(loglik = loglik_pi,
                     start = 0.5, n = 170, v = 8)
 plot(ml_pi) +
   labs(title = "Second order approximation to the pi likelihood",
-  x = expression(pi), caption = "Figure 2: Log-likelihood function and second-order approximation for pi."
+  x = expression(pi), 
+  caption = "Figure 2: Log-likelihood function and second-order approximation for pi."
   )+
   theme_classic()+
   theme(plot.caption = element_text(hjust = 0.5))
@@ -346,9 +347,9 @@ upper.sim <- quantile(psi.sim, c(0.025, 0.975))[[2]]
 
 ```
 
-With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap returns a confidence interval of [`r lower.sim`, `r upper.sim`].
+With the observed Fisher Information, we find our large sample confidence interval to be [`r round(lower, 4)`, `r round(upper, 4)`]. On the other hand, the parametric bootstrap with 100000 samples returns a confidence interval of [`r lower.sim`, `r upper.sim`].
 
-The significance test returns `r pval`, which is comparable to our empirical p-value, `r 1/100000`. Since none of the bootstrapped values were greater than our observed likelihood ratio statistic, W, our empirical P-value was calculated as $\frac {1}{\text{bootstrap sample size} + 1}$.  
+The significance test returns `r pval`, which is comparable to our empirical p-value, `r 1/100000`. Since none of the bootstrapped values were greater than our observed likelihood ratio statistic, W, our empirical P-value was calculated as $\frac {1}{\text{bootstrap samples} + 1}$.  
 
 ## Bayesian Inference Results
 
