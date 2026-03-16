@@ -435,22 +435,19 @@ In the future, large pharmaceutical companies that use Bayesian methods should b
 
 # References
 
-
-Grove, R. (2026). *Chapter 13.1: Bayesian Inference*. Lecture 13, Slide 30, STAT 342, University of Washington - Seattle.
+BioNTech/Pfizer . A phase 1/2/3, placebo‐controlled, randomized, observer‐blind, dose‐finding study to evaluate the safety, tolerability, immunogenicity, and efficacy of SARS‐Cov‐2 RNA vaccine candidates against Covid‐19 in healthy individuals. 2020:1–136. Accessed 28 November 2021. https://cdn.pfizer.com/pfizercom/2020-11/C4591001_Clinical_Protocol_Nov2020.pdf
 
 Grove, R. (2025). *Chapter 3*. Lecture 3, Slide 7, STAT 341, University of Washington - Seattle.
+
+Grove, R. (2026). *Chapter 13.1: Bayesian Inference*. Lecture 13, Slide 30, STAT 342, University of Washington - Seattle.
 
 Grove, R. (2026). *Chapter 11: Maximum Likelihood Estimation*. Lecture 11, Slide 33, STAT 342, University of Washington - Seattle.
 
 Ortiz-Prado, E., Suárez-Sangucho, I. A., Vasconez-Gonzalez, J., Santillan-Roldán, P. A., Villavicencio-Gomezjurado, M., Salazar-Santoliva, C., Tello-De-la-Torre, A., & Izquierdo-Condoy, J. S. (2025). Pandemic paradox: How the COVID-19 crisis transformed vaccine hesitancy into a two-edged sword. Human vaccines & immunotherapeutics, 21(1), 2543167. https://doi.org/10.1080/21645515.2025.2543167
 
-Senn S. (2022). The design and analysis of vaccine trials for COVID-19 for the purpose of estimating efficacy. Pharmaceutical statistics, 21(4), 790–807. https://doi.org/10.1002/pst.2226
-
-BioNTech/Pfizer . A phase 1/2/3, placebo‐controlled, randomized, observer‐blind, dose‐finding study to evaluate the safety, tolerability, immunogenicity, and efficacy of SARS‐Cov‐2 RNA vaccine candidates against Covid‐19 in healthy individuals. 2020:1–136. Accessed 28 November 2021. https://cdn.pfizer.com/pfizercom/2020-11/C4591001_Clinical_Protocol_Nov2020.pdf
-
-Grove, R. (2026). *Chapter 13.1: Bayesian Inference*. Lecture 13, Slide 30, STAT 342, University of Washington - Seattle.
-
 Polack, F. P., Thomas, S. J., Kitchin, N., Absalon, J., Gurtman, A., Lockhart, S., Perez, J. L., et al. (2020). *Safety and efficacy of the BNT162b2 mRNA Covid-19 vaccine*. **New England Journal of Medicine**, 383(27), 2603–2615. https://doi.org/10.1056/NEJMoa2034577
+
+Senn S. (2022). The design and analysis of vaccine trials for COVID-19 for the purpose of estimating efficacy. Pharmaceutical statistics, 21(4), 790–807. https://doi.org/10.1002/pst.2226
 
 Thompson, M. G., Burgess, J. L., Naleway, A. L., etour empirical p-value, al. (2021). *Interim estimates of vaccine effectiveness of BNT162b2 and mRNA-1273 COVID-19 vaccines in preventing SARS-CoV-2 infection among health care personnel, first responders, and other essential and frontline workers — Eight U.S. locations, December 2020–March 2021*. MMWR Morbidity and Mortality Weekly Report, 70, 495–500.  
 http://dx.doi.org/10.15585/mmwr.mm7013e3
@@ -527,7 +524,7 @@ As the sample sizes $n_1$ and $n_2$ are quite large, we know that the binomial r
 $$X \approx Pois(n_1\pi_v) \ Y \approx Pois(n_2\pi_p)$$ Where $\lambda_x = E[X] = n_1\pi_v$, and similarly for $\lambda_y = E[Y]$  
 Before we proceed with the proof, we will prove two Lemmas, which will help with our main argument.
 
-#### Lemma I
+#### [Lemma I]
 
 Theorem: The rate of a COVID patient being in the vaccine group, $\pi$, is the probability $P(\text{Vaccine}|\text{COVID})$. Then:
 $$\pi = \frac{P(\text{COVID}|\text{Vaccine)} \cdot P(\text{Vaccine})}{P(\text{COVID})} = \frac{n_1 \pi_v}{\pi_vn_1 + \pi_pn_2}$$ Proof:  
@@ -548,7 +545,7 @@ Thus,
 \end{align*}
 
 
-#### Lemma II
+#### [Lemma II]
 
 Theorem: Let $X$ and $Y$ be two independent Poisson random variables. Then, the sum of $X$ and $Y$ is also a Poisson distribution. That is,
 $$S \sim Pois(\lambda_1 + \lambda_2) \quad S = X + Y$$ Proof:  
