@@ -270,17 +270,17 @@ P(\Psi \le q_{0.5} \mid V = v_{obs}) = 0.5.
 $$ 
 
 Using the transformation between $\Psi$ and $\Pi$,
+$$
+\begin{aligned}
+P(\Psi \le q_{\Psi|V,0.5} \mid V= v_{obs})
+&= P\left(\frac{1-2\Pi}{1-\Pi} \le q_{\Psi|V,0.5} \,\middle|\, V= v_{obs}\right) \\
+&= P\left(\Pi(q_{\Psi|V,0.5} -2) \le q_{\Psi|V,0.5} -1 \,\middle|\, V =v_{obs}\right) \\
+&= P\left(\Pi \ge \frac{q_{\Psi|V,0.5}-1}{q_{\Psi|V,0.5} -2} \,\middle|\, V=v_{obs}\right) =0.5\\
+P\left(\Pi \le \frac{q_{\Psi|V,0.5}-1}{q_{\Psi|V,0.5} -2} \,\middle|\, V=v_{obs}\right)&= 1-0.5
+\end{aligned}
+$$
 
-\begin{align*}
-P(\Psi \le q_{\Psi,0.5} \mid V= v_{obs})
-&= P\left(\frac{1-2\Pi}{1-\Pi} \le q_{\Psi,0.5} \,\middle|\, V= v_{obs}\right) \\
-&= P\left(\Pi(q_{\Psi,0.5} -2) \le q_{\Psi,0.5} -1 \,\middle|\, V =v_{obs}\right) \\
-&= P\left(\Pi \ge \frac{q_{\Psi,0.5}-1}{q_{\Psi,0.5} -2} \,\middle|\, V=v_{obs}\right) =0.5\\
-P\left(\Pi \le \frac{q_{\Psi,0.5}-1}{q_{\Psi,0.5} -2} \,\middle|\, V=v_{obs}\right)&= 1-0.5
-\end{align*}
-
-
-A similar transformation can be used to obtain the 95\% credible interval for $\Psi$. Let $q_{\Psi,0.025}$ and $q_{\Psi,0.975}$ denote the 2.5th and 97.5th percentiles of the posterior distribution of $\Psi$. The corresponding endpoints are
+A similar transformation can be used to obtain the 95\% credible interval for $\Psi$. Let $q_{\Psi|V,0.025}$ and $q_{\Psi|V,0.975}$ denote the 2.5th and 97.5th percentiles of the posterior distribution of $\Psi$. The corresponding endpoints are
 
 $$
 q_{\Psi|V,0.025}=\frac{1-2q_{\Pi|V,0.975}}{1-q_{\Pi|V,0.975}},
