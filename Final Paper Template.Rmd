@@ -126,7 +126,7 @@ plot(ml_pi) +
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
-We see the second-order Taylor approximation is accurate, mostly aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:
+We see the second-order Taylor approximation is accurate, mostly aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we use theorem 12.1 (Grove, 2026, Lecture 12) to calculate our observed Fisher Information:
 
 \begin{align*}
 I(\psi) &= - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right] \\ 
@@ -439,9 +439,11 @@ BioNTech/Pfizer . A phase 1/2/3, placebo‐controlled, randomized, observer‐bl
 
 Grove, R. (2025). *Chapter 3*. Lecture 3, Slide 7, STAT 341, University of Washington - Seattle.
 
-Grove, R. (2026). *Chapter 13.1: Bayesian Inference*. Lecture 13, Slide 30, STAT 342, University of Washington - Seattle.
-
 Grove, R. (2026). *Chapter 11: Maximum Likelihood Estimation*. Lecture 11, Slide 33, STAT 342, University of Washington - Seattle.
+
+Grove, R. (2026). *Chapter 12: Likelihood Inference*. Lecture 12, Slide 3, STAT 342, University of Washington - Seattle.
+
+Grove, R. (2026). *Chapter 13.1: Bayesian Inference*. Lecture 13, Slide 30, STAT 342, University of Washington - Seattle.
 
 Ortiz-Prado, E., Suárez-Sangucho, I. A., Vasconez-Gonzalez, J., Santillan-Roldán, P. A., Villavicencio-Gomezjurado, M., Salazar-Santoliva, C., Tello-De-la-Torre, A., & Izquierdo-Condoy, J. S. (2025). Pandemic paradox: How the COVID-19 crisis transformed vaccine hesitancy into a two-edged sword. Human vaccines & immunotherapeutics, 21(1), 2543167. https://doi.org/10.1080/21645515.2025.2543167
 
