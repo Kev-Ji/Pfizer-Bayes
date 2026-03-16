@@ -7,7 +7,7 @@ urlcolor: blue
 geometry: margin = 1in
 header-includes:
 - \usepackage{amsmath,amsfonts,amssymb}
-- \usepackage{setspace} \doublespacing
+- \usepackage{setspace}
 fontsize: 11pt
 
 ---
@@ -20,14 +20,15 @@ library(fastR2)
 
 ```
 
-# Abstract
-
+\begin{abstract}
+\noindent
 COVID-19 caused major global health problems and created an urgent need for effective vaccines. In this study, we reviewed the Pfizer–BioNTech BNT162b2 vaccine trial reported by Polack et al. (2020) and reanalyze its efficacy using both frequentist and Bayesian methods. Using the observed data of 8 infections in the vaccine group and 162 in the placebo group, we estimate the vaccine efficacy parameter and evaluate whether it exceeds the FDA benchmark of 30%. The frequentist analysis uses maximum likelihood estimation, a large-sample confidence interval, and a likelihood ratio test. The Bayesian analysis uses a beta-binomial model with prior elicitation, posterior summaries, and a posterior probability calculation. Both approaches show strong evidence that the vaccine efficacy is substantially greater than 30%. Our findings confirm the high effectiveness of the BNT162b2 vaccine and demonstrate how frequentist and Bayesian methods can provide complementary perspectives in statistical analysis.
+\end{abstract}
 
 # Keywords
 *Bayesian Inference*, *Likelihood Inference*, *COVID-19*, *Vaccine efficacy*
 
-\newpage
+ \doublespacing
 
 # Introduction
 Beginning in 2019, the COVID-19 pandemic has had a profound impact on global public health. It has been estimated that approximately 18.2 million people died worldwide as a result of the pandemic (Wang, Haidong et al. 2020-21). Vaccination therefore became a critical strategy for reducing infection and mortality. There are studies showing that "Authorized mRNA COVID-19 vaccines are effective for preventing SARS-CoV-2 infection in real-world conditions." and  COVID-19 vaccination is recommended for all eligible persons."(Thompson et al., 2021). One of the most widely used vaccines is the BNT162b2 mRNA vaccine developed by Pfizer and BioNTech.
@@ -223,10 +224,12 @@ post_psi <- function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
 pfizer_prior <- function(x) {(1-x)^-0.700102/(beta(0.700102,1) * (2-x)^1.700102)}
 ggplot() +
 geom_function(fun = post_psi, xlim = c(0,1), aes(color = "Posterior"), linewidth = 1.2) +
-geom_function(fun = pfizer_prior, xlim = c(0,1), aes(color = "Pfizer Prior"), linewidth = 1.2) +
+geom_function(fun = pfizer_prior, xlim = c(0,1), 
+aes(color = "Pfizer Prior"), linewidth = 1.2) +
 geom_function(fun = prior_psi, xlim = c(0,1),
               aes(color = "Prior"), linewidth = 1.2, linetype = 'dashed') +
-scale_color_manual(values = c("Posterior" = "firebrick","Prior" = "steelblue", "Pfizer Prior" = "darkgreen")) +
+scale_color_manual(values = c("Posterior" = "firebrick",
+"Prior" = "steelblue", "Pfizer Prior" = "darkgreen")) +
 labs(x = expression(psi), y = "Density", color = "",
      title = "Pfizer's Prior, and Our Prior and\n Posterior Distributions of Psi",
      caption = "Figure 3: Prior and posterior densities for Psi.") +
@@ -372,15 +375,15 @@ P(\psi \leq 0.3|v) = 2.959 \cdot10^{-17}
 $$
 Since the posterior probability that $\psi \leq 0.3$ is essentially zero, we can reject the null hypothesis.
 
-
-
 # Discussion / Conclusion
 
-```{r label = "Table Code", echo=FALSE,eval=FALSE,warning=FALSE, message=FALSE}
+```{r label = "Table Code", warning=FALSE, message=FALSE}
 library(knitr)
 library(latex2exp)
-ci.df <- data.frame(Lower_Bound = c(lower, q_025, 0.903), Upper_Bound = c(upper, q_975, 0.976))
-rownames(ci.df) <- c("MLE Confidence Interval" , "Our Credible Interval", "Pfizer's Credible Interval")
+ci.df <- data.frame(Lower_Bound = c(lower, q_025, 0.903), 
+Upper_Bound = c(upper, q_975, 0.976))
+rownames(ci.df) <- c("MLE Confidence Interval" , 
+"Our Credible Interval", "Pfizer's Credible Interval")
 colnames(ci.df) <- c("Lower Bound", "Upper Bound")
 
 kable(ci.df,
@@ -393,6 +396,7 @@ While all three tests validate that the BNT162b2 vaccine was more efficacious th
 
 In the future, large pharmaceutical companies that use Bayesian methods should be more rigorous and transparent about their selection of a prior. We have demonstrated that through selecting a more rigorous prior, prior selection can impact the magnitude of final estimates significantly- even if the treatment is highly effective. Without fully transparent methodology, fellow researchers and the general can become skeptical of one's findings which can create material harms in public health. 
 
+\newpage
 
 # Bibliography
 
@@ -417,60 +421,54 @@ http://dx.doi.org/10.15585/mmwr.mm7013e3
 Wang, Haidong, et al. (2022). *Estimating excess mortality due to the COVID-19 pandemic: A systematic analysis of COVID-19-related mortality, 2020–21*. The Lancet, 399(10334), 1513–1536.  
 https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(21)02796-3/fulltext
 
-\newpage
+\singlespacing
+
 # Appendix
 
-### Setup 
-```{r ref.label = "setup", eval = FALSE}
-```
+
 
 ## Code
-### Data visualization
+
+*Setup* 
+```{r ref.label = "setup", eval = FALSE, tidy = FALSE, prompt = FALSE}
+```
+*Data visualization*
 ```{r ref.label = "data vis", echo = T, eval = F, warning=F}
 ```
-### Plot second-order taylor approximation against log-likelihood
+*Plot second-order taylor approximation against log-likelihood*
 ```{r ref.label = "frequentistTaylorPlot", echo = T, eval = F, warning=F}
 ```
-
-### Compute large sample confidence interval for the MLE  
+*Compute large sample confidence interval for the MLE* 
 ```{r ref.label = "likelihoodCI", echo = T, eval = F}
 ```
-
-### Compute pvalue using likelihood ratio statistic  
+*Compute pvalue using likelihood ratio statistic*  
 ```{r ref.label="likelihoodPval", echo = T, eval = F}
 ```
-
-### Parametric Bootstrap for psi
-```{r ref.label="parametricBootstrap", echo = T, eval = F}
+*Parametric Bootstrap for psi*
+```{r ref.label="Parametric bootstrap", echo = T, eval = F}
 ```
-
-### Find Prior
-```{r ref.label="find prior", echo = T, eval = F}
+*Find Prior*
+```{r ref.label="find prior", eval = F}
 ```
-
-### Compute statistics for psi
-```{r ref.label= "Compute statistics for psi", echo = T, eval = F}
+*Compute statistics for psi*
+```{r ref.label= "Compute statistics for psi", eval = F}
 ```
-
-### Plot of posterior distribution of psi
+*Plot of posterior distribution of psi*
 ```{r ref.label= "Plot of post dist. of psi", echo = T, eval = F}
 ```
-
-### Computing 50th, 2.5th, 0.975th of Psi
+*Computing 50th, 2.5th, 0.975th of Psi*
 ```{r ref.label= "csp", echo = T, eval = F}
 ```
-
-### Parametric Boostrap
+*Parametric Boostrap*
 ```{r ref.label = "Parametric bootstrap", eval = FALSE}
 ```
-
-### Table Code
-```{r ref.label = "Table Code", eval = FALSE}
+*Table Code*
+```{r ref.label = "Table Code", echo = T, eval = FALSE}
 ```
 
 
 ## Proofs
-### Proving that the random variable `V`, representing the proportion of people who were infected with COVID that were in the vaccine group, approximates to the binomial distribution.  
+Proving that the random variable `V`, representing the proportion of people who were infected with COVID that were in the vaccine group, approximates to the binomial distribution.  
 
 \begin{table}[h]
 \centering
@@ -530,7 +528,7 @@ $$ $\sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}$ is the binomial 
 $$P(S = n) = \frac{e^{-\lambda_1 + \lambda_2} (\lambda_1 + \lambda_2)^n}{n!}$$ Thus, from the PMF above:
 $$X + Y = S \sim Pois(\lambda_1 + \lambda_2)_\square$$  
 
-#### Main proof  
+#### Main proof  \newline
 
 Theorem: The random variable $V$, defined above, approximates to the binomial distribution.  
 Proof:  
