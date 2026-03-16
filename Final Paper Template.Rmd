@@ -35,8 +35,6 @@ Vaccine efficacy measures the proportional reduction in infection risk among vac
 In our report, we aim to re-analyze these data using both Frequentist and Bayesian statistical approaches.  In particular, we estimate the vaccine efficacy parameter and test whether the efficacy exceeds the FDA guideline of 30%. These analyses provide an independent statistical assessment of the effectiveness of the BNT162b2 vaccine in preventing COVID-19 infection.
 
 
-
-
 ```{r, label ='data vis' ,echo = FALSE, fig.width= 4, fig.height= 2.5, fig.align='center'}
 df <- data.frame(
   Group = c('BNT162b2', 'Placebo'),
@@ -60,13 +58,13 @@ ggplot(df, aes(x = Group, y = rate, fill = Group))+
 
 We define $V$ as the number of people who were infected with COVID-19 that received the vaccine. $n$ is the total number of test subjects that were infected (170 in our case) and $\pi_0$ is the true but unknown probability of being vaccinated given that they are infected. 
 
-This true probability has been calculated in terms of two other probabilities, $\pi_v$ and $\pi_p$, which are the proportions of COVID infections, for the vaccine and placebo groups respectively, and since the trial is approximately 1:1 randomized, we have 
+This true probability has been calculated in terms of two other probabilities, $\pi_{v0}$ and $\pi_{p0}$, which are the proportions of COVID infections, for the vaccine and placebo groups respectively, and since the trial is approximately 1:1 randomized, we have 
 
-$$\pi = \frac{\pi_v}{\pi_v + \pi_p}$$  
+$$\pi_0 = \frac{\pi_{v0}}{\pi_{v0} + \pi_{p0}}$$  
 
-What we are interested in is the efficacy of the vaccine, $\psi$. This efficacy, according to the study, is computed with the following formula [CITE HERE]:  
+What we are interested in is the efficacy of the vaccine, $\psi_0$. The estimate of this efficacy, $\psi$, is computed as the inverse of the estimated relative risk. That is:  
 
-$$\psi = \frac{1 - 2\pi}{1 - \pi}$$  
+$$\psi = 1 - \frac{\pi_v}{\pi_p} = \frac{1 - 2\pi}{1 - \pi}$$  
 
 We can transform this variable in terms of $\psi$ (which is more helpful for our inferences):  
 
@@ -254,23 +252,26 @@ f_{\Psi}(\psi)
 \qquad -\infty < \psi \le 1.
 $$
 
-The prior and posterior densities for $\psi$ are shown below.
+The prior and posterior densities (as well as the Pfizer study's prior distribution for comparison) for $\psi$ are shown below.
 
 ```{r, label = 'Plot of post dist. of psi', echo=FALSE, warning=FALSE, message=FALSE, fig.width=4.5, fig.height=2.5}
 prior_psi <- function(x) {(1-x)^25.2/(beta(26.2,26.2)*(2-x)^52.4)}
-post_psi <- function(x) {(1-x)^33.2/(beta(34.2,188.2)*(2-x)^222.4)}
+post_psi <- function(x) {(1-x)^33.2/(beta(34.2, 188.2)*(2-x)^222.4)}
+pfizer_prior <- function(x) {(1-x)^-0.700102/(beta(0.700102,1) * (2-x)^1.700102)}
 ggplot() +
 geom_function(fun = post_psi, xlim = c(0,1), aes(color = "Posterior"), linewidth = 1.2) +
+geom_function(fun = pfizer_prior, xlim = c(0,1), aes(color = "Pfizer Prior"), linewidth = 1.2) +
 geom_function(fun = prior_psi, xlim = c(0,1),
               aes(color = "Prior"), linewidth = 1.2, linetype = 'dashed') +
-scale_color_manual(values = c("Posterior" = "firebrick","Prior" = "steelblue")) +
+scale_color_manual(values = c("Posterior" = "firebrick","Prior" = "steelblue", "Pfizer Prior" = "darkgreen")) +
 labs(x = expression(psi), y = "Density", color = "",
-     title = "Prior and Posterior Distributions of Psi",
+     title = "Pfizer's Prior, and Our Prior and\n Posterior Distributions of Psi",
      caption = "Figure 3: Prior and posterior densities for Psi.") +
 theme_classic()+
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
+Minding the asymptote, the plot suggests that Pfizer's prior of $\pi \sim B(0.700102, 1)$ is optimistic and assumes efficacy.  
 Posterior summaries of $\psi$ can also be obtained from the posterior distribution of $\pi$ using the transformation $\psi = \frac{1-2\pi}{1-\pi}$.
 
 The posterior median of $\psi$ is defined by the value $q_{\psi, 0.5}$ satisfying
@@ -435,7 +436,6 @@ Since the posterior probability that $\psi \leq 0.3$ is essentially zero, we can
 
 
 # Discussion / Conclusion
-Discuss / conclude here.
 
 # Bibliography
 
