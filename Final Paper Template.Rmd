@@ -95,7 +95,7 @@ $$
 \widehat{\psi}_0^{mle} = \frac{1 - 2(\frac{8}{170})}{1 - (\frac{8}{170})} \approx 0.9506
 $$ We can verify this with the transformed likelihood function, $L^{\ast}(\psi)$. We begin with the binomial likelihood function, and transform it to be in terms of $\psi$:
 $$
-\begin{aligned}
+\begin{align*}
 L(\pi) &= \binom{n}{v}\pi^v(1-\pi)^{n-v} \\
 L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (1- \frac{1 - \psi}{2 - \psi})^{n-v} \\
 L^{\ast}(\psi) &= \binom{n}{v} (\frac{1 - \psi}{2 - \psi})^v (\frac{1}{2 - \psi})^{n - v} \\
@@ -133,8 +133,8 @@ plot(ml_pi) +
 ```
 
 We see the second-order Taylor approximation is accurate, mostly aligned with the log-likelihood. Thus, we move forward with the large sample confidence interval. To do so, we need to calculate our observed Fisher Information:
-$$
-\begin{aligned}
+
+\begin{align*}
 I(\psi) &= - E \left[ \frac{d^2}{d\psi^2} \ell^\ast(\psi)\right] \\ 
 I(\psi) &= E \left[ \frac{v}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \right] \\
 I(\psi) &= \frac{E[v]}{(1-\psi)^2} - \frac{n}{(2-\psi)^2} \\
@@ -152,9 +152,10 @@ $$
 H_0: \psi_0 = 0.3
 \quad 
 H_1: \psi_0 \neq 0.3
-$$ We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$
-$$
-\begin{aligned}
+$$ 
+We know $W = 2\ln(\Lambda)$, where $\Lambda = \frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}$
+
+\begin{align*}
 W &= 2 \ln(\frac{L(\widehat{\psi}_0^{mle})}{L(\psi^{null}_0)}) \\  
 W &= 2 \ln(\frac{\binom{n}{v}\frac{(1 - \widehat{\psi}_0^{mle})^v}{(2 - \widehat{\psi}_0^{mle})^n}}{\binom{n}{v}\frac{(1 - \psi^{null}_0)^v}{(2 - \psi^{null}_0)^n}}) \\  
 W &= 2 \ln(\frac{(1 - \widehat{\psi}_0^{mle})^v (2 - \psi^{null}_0)^n}{(2 - \widehat{\psi}_0^{mle})^n (1-\psi^{null}_0)^v}) \\  
@@ -212,22 +213,21 @@ $$
 To obtain the posterior distribution of $\Psi$, we use the transformation (1)  
 
 For $-\infty < \psi \le 1$, the cumulative distribution function of $\Psi$ is
-$$
-\begin{aligned}
+
+\begin{align*}
 P(\Psi \leq \psi | V= v) &=P(\frac{1-2\Pi}{1-\Pi} \leq \psi|V=v) \quad -\infty  < \psi \leq 1 \\
 &= 1- P(\Pi  \leq \frac{\psi-1}{\psi-2}|V=v )\\
 F_{\Psi|V}(\psi|v) &= 1- F_{\Pi|V}(\frac{\psi-1}{\psi-2}|v) \\
-\end{aligned}
-$$
+\end{align*}
 
 Differentiating gives the posterior density of $\psi$:
 
-$$
-\begin{aligned}
+
+\begin{align*}
 f_{\Psi|V}(\psi|v) &=  (1- F_{\Pi|V}(\frac{\psi-1}{\psi-2}|v))'(\frac{\psi-1}{\psi-2})'\\
 f_{\Psi|V}(\psi|v) &= f_{\Pi|V}(\frac{\psi-1}{\psi-2}|v)\frac{1}{(\psi -2)^2} = \frac{(1-\psi)^{a-1}}{B(a,b)(2-\psi)^{a+b}} \\
-\end{aligned}
-$$
+\end{align*}
+
 Substituting the $\text{Beta}(34.2,188.2)$ density gives
 $$
 f_{\Psi \mid V}(\psi \mid v)
@@ -275,15 +275,15 @@ P(\Psi \le q_{0.5} \mid V = v_{obs}) = 0.5.
 $$ 
 
 Using the transformation between $\Psi$ and $\Pi$,
-$$
-\begin{aligned}
+
+\begin{align*}
 P(\Psi \le q_{\Psi,0.5} \mid V= v_{obs})
 &= P\left(\frac{1-2\Pi}{1-\Pi} \le q_{\Psi,0.5} \,\middle|\, V= v_{obs}\right) \\
 &= P\left(\Pi(q_{\Psi,0.5} -2) \le q_{\Psi,0.5} -1 \,\middle|\, V =v_{obs}\right) \\
 &= P\left(\Pi \ge \frac{q_{\Psi,0.5}-1}{q_{\Psi,0.5} -2} \,\middle|\, V=v_{obs}\right) =0.5\\
 P\left(\Pi \le \frac{q_{\Psi,0.5}-1}{q_{\Psi,0.5} -2} \,\middle|\, V=v_{obs}\right)&= 1-0.5
-\end{aligned}
-$$
+\end{align*}
+
 
 A similar transformation can be used to obtain the 95\% credible interval for $\Psi$. Let $q_{\Psi,0.025}$ and $q_{\Psi,0.975}$ denote the 2.5th and 97.5th percentiles of the posterior distribution of $\Psi$. The corresponding endpoints are
 
@@ -539,19 +539,21 @@ Before we proceed with the proof, we will prove two Lemmas, which will help with
 Theorem: The rate of a COVID patient being in the vaccine group, $\pi$, is the probability $P(\text{Vaccine}|\text{COVID})$. Then:
 $$\pi = \frac{P(\text{COVID}|\text{Vaccine)} \cdot P(\text{Vaccine})}{P(\text{COVID})} = \frac{n_1 \pi_v}{\pi_vn_1 + \pi_pn_2}$$ Proof:  
 Using the data and the distribution definitions above:
-$$
-\begin{aligned}
+
+\begin{align*}
 P(\text{COVID}|\text{Vaccine}) &= \pi_v  \\
 P(\text{Vaccine}) &= \frac{n_1}{n_1 + n_2}\\  
 P(\text{COVID}) &= \frac{\pi_vn_1 + \pi_pn_2}{n_1 + n_2}\\
-\end{aligned}
-$$ Thus,
-$$
-\begin{aligned}  
+\end{align*}
+
+
+Thus,
+
+\begin{align*}  
 \pi &= \frac{\pi_v \cdot \frac{n_1}{n_1 + n_2}}{\frac{\pi_vn_1 + \pi_pn_2}{n_1 + n_2}}\\
 \pi &= \frac{n_1 \pi_v}{\pi_vn_1 + \pi_pn_2}_\square\\
-\end{aligned}
-$$  
+\end{align*}
+
 
 #### Lemma II
 
@@ -559,19 +561,22 @@ Theorem: Let $X$ and $Y$ be two independent Poisson random variables. Then, the 
 $$S \sim Pois(\lambda_1 + \lambda_2) \quad S = X + Y$$ Proof:  
 Let $X \sim Pois(\lambda_1)$ and, independently, $Y \sim Pois(\lambda_2)$. Suppose $S = X + Y$  
 Then:
-$$
-\begin{aligned}
+
+\begin{align*}
 P(X = x) &= \frac{e^{-\lambda_1}\lambda_1^x}{x!}\\  
 P(Y = n - x) &= \frac{e^{-\lambda_2}\lambda_2^{n-x}}{(n-x)!}\\ 
-\end{aligned}  
-$$ By theorem 3.1 (Grove, 2025, Lecture 3):
-$$
-\begin{aligned}  
+\end{align*}  
+ 
+
+By theorem 3.1 (Grove, 2025, Lecture 3):
+
+\begin{align*}  
 P(S = n) &= \sum_{x = 0}^{n}P(X = x)P(Y = n - x)\\
 P(S = n) &= \sum_{x = 0}^n \frac{e^{-\lambda_1}\lambda_1^x}{x!} \cdot \frac{e^{-\lambda_2}\lambda_2^{n-x}}{(n-x)!}\\  
 P(S = n) &= e^{-\lambda_1 + \lambda_2} \sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}\\
-\end{aligned}
-$$ $\sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}$ is the binomial expansion of $\frac{(\lambda_1 + \lambda_2)^n}{n!}$. So,
+\end{align*}
+
+$\sum_{x = 0}^n \frac{\lambda_1^x\lambda_2^{n-x}}{x!(n-x)!}$ is the binomial expansion of $\frac{(\lambda_1 + \lambda_2)^n}{n!}$. So,
 $$P(S = n) = \frac{e^{-\lambda_1 + \lambda_2} (\lambda_1 + \lambda_2)^n}{n!}$$ Thus, from the PMF above:
 $$X + Y = S \sim Pois(\lambda_1 + \lambda_2)_\square$$  
 
@@ -580,31 +585,32 @@ $$X + Y = S \sim Pois(\lambda_1 + \lambda_2)_\square$$
 Theorem: The random variable $V$, defined above, approximates to the binomial distribution.  
 Proof:  
 We proceed by finding the Probability Mass Function (PMF) of $V$. We know $V$ to be the value of $X$ given the constraint that $X + Y = n$. Our process, minding the independence of $X$ and $Y$, thus follows:
-$$
-\begin{aligned}
+
+\begin{align*}
 P(V=v) &= P(X = v|X+Y=n)\\  
 P(V=v) &= \frac{P(X = v \cap X+Y = n)}{P(X + Y = n)}\\  
 P(V=v) &= \frac{P(X=v) \times P(Y = n-v)}{P(X + Y = n)}\\  
-\end{aligned}
-$$ As $X$ and $Y$ can be approximated with the Poisson distribution, we will use the Poisson PMF, $\frac{e^{-\lambda}\lambda^x}{x!}$.  
+\end{align*}
+
+As $X$ and $Y$ can be approximated with the Poisson distribution, we will use the Poisson PMF, $\frac{e^{-\lambda}\lambda^x}{x!}$.  
 Remember that $X \approx Pois(n_1\pi_v)$ and $Y \approx Pois(n_2\pi_p)$. And so, by Lemma II, $X+Y \approx Pois(n_1\pi_v + n_2\pi_p)$
-$$
-\begin{aligned}
+
+\begin{align*}
 P(V=v) = \frac{\frac{e^{-(n_1\pi_v)}(n_1\pi_v)^v}{v!} \times \frac{e^{-(n_2\pi_p)}(n_2\pi_p)^{n-v}}{(n-v)!}}{\frac{e^{-(n_1\pi_v + n_2\pi_p)}(n_1\pi_v + n_2\pi_p)^{n}}{n!}}\\  
 P(V = v) = \frac{n!}{v!(n-v)!} \times \frac{(n_1\pi_v)^v(n_2\pi_p)^{n-v} e^{-(n_1\pi_v + n_2\pi_p)}}{(n_1\pi_v + n_2\pi_p)^n e^{-(n_1\pi_v + n_2\pi_p)}}\\  
 P(V=v) = \binom{n}{v} \frac{(n_1\pi_v)^n(n_2\pi_p)^{n-v}}{(n_1\pi_v + n_2\pi_p)^v(n_1\pi_v + n_2\pi_p)^{n-v}}\\
-\end{aligned}
-$$ We apply Lemma I, to simplify the following:
-$$
-\begin{aligned}
+\end{align*}
+ We apply Lemma I, to simplify the following:
+
+\begin{align*}
 \frac{(n_1\pi_v)^v}{(n_1\pi_v + n_2\pi_p)^v} = (\frac{n_1\pi_v}{\pi_vn_1 + \pi_pn_2})^v = \pi^v\\  
 (\frac{n_2\pi_p}{n_1\pi_v + n_2\pi_p})^{n-v} = (1 - \frac{n_1\pi_v}{\pi_vn_1 + \pi_pn_2})^{n-v} = (1 - \pi)^{n - v}\\
-\end{aligned}
-$$ Thus,
-$$
-\begin{aligned}
+\end{align*}
+Thus,
+
+\begin{align*}
 P(V=v) = \binom{n}{v}\pi^v(1-\pi)^{n-v}\\
-\end{aligned}
-$$
+\end{align*}
+
 The PMF of the binomial distribution. Therefore:
 $$V \approx Binom(n, \pi)_\blacksquare$$
