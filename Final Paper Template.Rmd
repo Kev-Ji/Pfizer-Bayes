@@ -377,7 +377,7 @@ Since the posterior probability that $\psi \leq 0.3$ is essentially zero, we can
 
 # Discussion / Conclusion
 
-```{r label = "Table Code", warning=FALSE, message=FALSE}
+```{r label = "Table Code", warning=FALSE, message=FALSE, eval =T, echo=FALSE}
 library(knitr)
 library(latex2exp)
 ci.df <- data.frame(Lower_Bound = c(lower, q_025, 0.903), 
