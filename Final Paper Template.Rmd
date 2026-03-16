@@ -385,8 +385,8 @@ Upper_Bound = c(upper, q_975, 0.976))
 rownames(ci.df) <- c("MLE Confidence Interval" , 
 "Our Credible Interval", "Pfizer's Credible Interval")
 colnames(ci.df) <- c("Lower Bound", "Upper Bound")
-
 kable(ci.df,
+      digits = 4,
       caption = TeX("95% CI for Psi", output = "character"))
 ```
 
